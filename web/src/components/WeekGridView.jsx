@@ -291,18 +291,24 @@ export default function WeekGridView({ sessions, courses, onSelectSession, onEdi
   // Pivot / auto-scroll to today's day when viewing the current week
   useEffect(() => {
     const weekContainsToday = weekDays.some((d) => isToday(d));
-    if (weekContainsToday && todayRef.current && !hasPivotedRef.current) {
-      hasPivotedRef.current = true;
-      const timer = setTimeout(() => {
-        todayRef.current?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-          inline: 'center',
-        });
-      }, 350);
-      return () => clearTimeout(timer);
+    if (weekContainsToday) {
+      const todayDay = new Date().getDay();
+      const todayIdx = todayDay === 0 ? 6 : todayDay - 1;
+      const targetIdx = !showWeekend && todayIdx >= 5 ? 4 : todayIdx;
+      if (!hasPivotedRef.current) {
+        hasPivotedRef.current = true;
+        setMobileSelectedDay(targetIdx);
+        const timer = setTimeout(() => {
+          todayRef.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+            inline: 'center',
+          });
+        }, 300);
+        return () => clearTimeout(timer);
+      }
     }
-  }, [currentDate, weekDays]);
+  }, [currentDate, weekDays, showWeekend]);
 
   // Detect if any session falls on weekend in this week
   const hasWeekendSessions = sessions.some((s) => {
@@ -424,11 +430,8 @@ export default function WeekGridView({ sessions, courses, onSelectSession, onEdi
               key={idx}
               type="button"
               onClick={() => {
-                if (mobileSelectedDay === idx) {
-                  setMobileSelectedDay(null);
-                } else {
-                  setMobileSelectedDay(idx);
-                }
+                setMobileSelectedDay(idx);
+                setCollapsedInAll({});
               }}
               className={`flex-1 min-w-[42px] flex-shrink-0 flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-xs transition-all relative ${
                 isSelected
@@ -511,24 +514,18 @@ export default function WeekGridView({ sessions, courses, onSelectSession, onEdi
 
           let markerPlaced = false;
 
-          const isCollapsedOnMobile =
-            mobileSelectedDay === null ||
-            (mobileSelectedDay !== 'all' && mobileSelectedDay !== dayIndex) ||
-            (mobileSelectedDay === 'all' && !!collapsedInAll[dayIndex]);
+          const isHiddenOnMobile = mobileSelectedDay !== 'all' && mobileSelectedDay !== dayIndex;
+          const isCollapsedInAll = mobileSelectedDay === 'all' && !!collapsedInAll[dayIndex];
 
           return (
             <React.Fragment key={day.toISOString()}>
-              {/* Mobile Collapsed Day Accordion (shown on mobile when day is collapsed) */}
-              {isCollapsedOnMobile && (
+              {/* Mobile Collapsed Day Accordion (only shown in 'all' view when day is collapsed) */}
+              {isCollapsedInAll && (
                 <div
                   ref={isCurrentDay ? todayRef : null}
                   id={isCurrentDay ? 'calendar-day-today-mobile' : undefined}
                   onClick={() => {
-                    if (mobileSelectedDay === 'all') {
-                      setCollapsedInAll((prev) => ({ ...prev, [dayIndex]: false }));
-                    } else {
-                      setMobileSelectedDay(dayIndex);
-                    }
+                    setCollapsedInAll((prev) => ({ ...prev, [dayIndex]: false }));
                   }}
                   className={`md:hidden flex items-center justify-between p-3 rounded-2xl border transition-all cursor-pointer shadow-sm active:scale-[0.99] ${
                     isCurrentDay
@@ -566,7 +563,7 @@ export default function WeekGridView({ sessions, courses, onSelectSession, onEdi
                 ref={isCurrentDay ? todayRef : null}
                 id={isCurrentDay ? 'calendar-day-today' : `calendar-day-${dayIndex}`}
                 className={`flex-col rounded-2xl border ${
-                  isCollapsedOnMobile ? 'hidden md:flex' : 'flex'
+                  isHiddenOnMobile || isCollapsedInAll ? 'hidden md:flex' : 'flex'
                 } ${
                   isCurrentDay
                     ? 'bg-gray-900/95 border-gray-700 ring-1 ring-white/10 shadow-xl'
@@ -603,23 +600,33 @@ export default function WeekGridView({ sessions, courses, onSelectSession, onEdi
                         Dziś
                       </span>
                     )}
-                    {/* Mobile Collapse (Zwiń) button */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (mobileSelectedDay === 'all') {
+                    {/* Mobile toggle button: Collapse if in 'all' view, or 'Cały tydzień' if in single day view */}
+                    {mobileSelectedDay === 'all' ? (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setCollapsedInAll((prev) => ({ ...prev, [dayIndex]: true }));
-                        } else {
-                          setMobileSelectedDay(null);
-                        }
-                      }}
-                      className="md:hidden text-[10px] text-gray-300 hover:text-white px-2 py-0.5 rounded-lg bg-gray-800/90 hover:bg-gray-750 border border-gray-700 font-semibold flex items-center gap-1 transition-colors"
-                      title="Zwiń ten dzień"
-                    >
-                      <span>Zwiń</span>
-                      <ChevronDown size={11} className="rotate-180 text-gray-400" />
-                    </button>
+                        }}
+                        className="md:hidden text-[10px] text-gray-300 hover:text-white px-2 py-0.5 rounded-lg bg-gray-800/90 hover:bg-gray-750 border border-gray-700 font-semibold flex items-center gap-1 transition-colors"
+                        title="Zwiń ten dzień"
+                      >
+                        <span>Zwiń</span>
+                        <ChevronDown size={11} className="rotate-180 text-gray-400" />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setMobileSelectedDay('all');
+                        }}
+                        className="md:hidden text-[10px] text-gray-300 hover:text-white px-2 py-0.5 rounded-lg bg-gray-800/90 hover:bg-gray-750 border border-gray-700 font-semibold flex items-center gap-1 transition-colors"
+                        title="Pokaż cały tydzień"
+                      >
+                        <span>Wszystkie dni</span>
+                      </button>
+                    )}
 
                     {/* Desktop: quick collapse weekend button for Sat/Sun */}
                     {dayIndex >= 5 && (
@@ -739,9 +746,12 @@ export default function WeekGridView({ sessions, courses, onSelectSession, onEdi
                         <React.Fragment key={cIdx}>
                           {showMarkerBeforeCluster && <CurrentTimeMarker now={now} />}
 
-                          {/* Gap / Break Indicator if there's a break > 20 mins */}
+                          {/* Gap / Break Indicator if there's a break > 20 mins and not yet passed */}
                           {cluster.gapBefore && (() => {
                             const breakEnd = cluster.start;
+                            if (isPastDay || (isCurrentDay && now >= breakEnd)) {
+                              return null;
+                            }
                             const breakStartMs = breakEnd.getTime() - cluster.gapBefore * 60_000;
                             const isInBreak = isCurrentDay && now.getTime() >= breakStartMs && now < breakEnd;
                             const remainingMin = isInBreak ? differenceInMinutes(breakEnd, now) : null;
@@ -779,7 +789,7 @@ export default function WeekGridView({ sessions, courses, onSelectSession, onEdi
                             <div className="flex items-center justify-between px-1 text-[11px] font-bold text-blue-300">
                               <span className="flex items-center gap-1.5">
                                 <span>⚡ Blok ciągły:</span>
-                                <span className="text-white font-extrabold">
+                                <span className="text-white font-extrabold font-mono whitespace-nowrap">
                                   {format(cluster.start, 'HH:mm')}–{format(cluster.end, 'HH:mm')}
                                 </span>
                               </span>
@@ -925,10 +935,10 @@ export default function WeekGridView({ sessions, courses, onSelectSession, onEdi
                                           )}
 
                                           {/* Time & Type Badge */}
-                                          <div className="flex items-center justify-between gap-1 mb-1">
-                                            <div className="flex items-center gap-1.5 min-w-0 truncate">
-                                              <span className="text-[10px] font-semibold text-gray-300 flex items-center gap-1 truncate">
-                                                <Clock size={11} className="text-gray-400 flex-shrink-0" />
+                                          <div className="flex items-center justify-between gap-1.5 mb-1 w-full">
+                                            <div className="flex items-center gap-1 flex-shrink-0 whitespace-nowrap">
+                                              <Clock size={11} className="text-gray-400 flex-shrink-0" />
+                                              <span className="text-[10.5px] font-semibold text-gray-200 font-mono tracking-tight whitespace-nowrap">
                                                 {format(start, 'HH:mm')}–{format(end, 'HH:mm')}
                                               </span>
                                             </div>

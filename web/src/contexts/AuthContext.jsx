@@ -16,7 +16,6 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   // Tokens for connected services
-  const [discordToken, setDiscordToken] = useState(null);
   const [microsoftToken, setMicrosoftToken] = useState(null);
   const [googleToken, setGoogleToken] = useState(null);
 
@@ -30,7 +29,6 @@ export function AuthProvider({ children }) {
           await loadLinkedTokens(firebaseUser.uid);
         } else {
           setUser(null);
-          setDiscordToken(null);
           setMicrosoftToken(null);
           setGoogleToken(null);
         }
@@ -131,14 +129,6 @@ export function AuthProvider({ children }) {
     );
   };
 
-  // Discord OAuth — redirect flow
-  const connectDiscord = () => {
-    const clientId = import.meta.env.VITE_DISCORD_CLIENT_ID;
-    const redirectUri = encodeURIComponent(`${window.location.origin}/auth/discord`);
-    const scopes = encodeURIComponent('identify guilds messages.read');
-    window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scopes}`;
-  };
-
   // Microsoft OAuth — redirect flow (MSAL-lite)
   const connectMicrosoft = () => {
     const clientId = import.meta.env.VITE_MICROSOFT_CLIENT_ID;
@@ -152,7 +142,6 @@ export function AuthProvider({ children }) {
 
   const logout = () => signOut(auth);
 
-  const isDiscordConnected = !!discordToken;
   const isMicrosoftConnected = !!microsoftToken;
 
   return (
@@ -161,13 +150,10 @@ export function AuthProvider({ children }) {
         user,
         loading,
         googleToken,
-        discordToken,
         microsoftToken,
-        isDiscordConnected,
         isMicrosoftConnected,
         loginWithGoogle,
         refreshGoogleToken,
-        connectDiscord,
         connectMicrosoft,
         saveToken,
         logout,

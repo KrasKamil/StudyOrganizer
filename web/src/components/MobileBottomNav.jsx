@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { CalendarDays, Calendar, CheckSquare, MessageSquare, Menu } from 'lucide-react';
+import { CalendarDays, Calendar, CheckSquare, Settings, Menu } from 'lucide-react';
 import { useData } from '../contexts/DataContext';
 
 export default function MobileBottomNav({ onOpenMobileMenu }) {
@@ -53,15 +53,15 @@ export default function MobileBottomNav({ onOpenMobileMenu }) {
       </NavLink>
 
       <NavLink
-        to="/inbox"
+        to="/settings"
         className={({ isActive }) =>
           `flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-semibold transition-all ${
             isActive ? 'text-white font-bold' : 'text-gray-400 hover:text-gray-200'
           }`
         }
       >
-        <MessageSquare size={18} />
-        <span className="mt-0.5">Platformy</span>
+        <Settings size={18} />
+        <span className="mt-0.5">Ustawienia</span>
       </NavLink>
 
       <button

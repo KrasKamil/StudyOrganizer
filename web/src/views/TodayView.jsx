@@ -332,9 +332,9 @@ export default function TodayView() {
 
               {/* Time & Location badges */}
               <div className="flex flex-wrap items-center gap-2 text-xs text-gray-300">
-                <span className="flex items-center gap-1.5 font-semibold text-white bg-gray-800/80 px-2.5 py-1 rounded-lg border border-gray-700/60 flex-shrink-0">
-                  <Clock size={13} className="text-blue-400" />
-                  {format(heroStart, 'HH:mm')} – {format(heroEnd, 'HH:mm')}
+                <span className="flex items-center gap-1.5 font-semibold text-white bg-gray-800/80 px-2.5 py-1 rounded-lg border border-gray-700/60 flex-shrink-0 whitespace-nowrap">
+                  <Clock size={13} className="text-blue-400 flex-shrink-0" />
+                  <span className="font-mono">{format(heroStart, 'HH:mm')} – {format(heroEnd, 'HH:mm')}</span>
                 </span>
 
                 {heroIsOnline ? (
@@ -587,7 +587,8 @@ export default function TodayView() {
                       const prevEnd = prevActive.end?.toDate?.() || new Date(prevActive.end);
                       const curStart = s.start?.toDate?.() || new Date(s.start);
                       const gapMin = differenceInMinutes(curStart, prevEnd);
-                      if (gapMin > 15) {
+                      // Only show break if >15 min, not all classes have ended, and the break hasn't already passed
+                      if (gapMin > 15 && !allTodayClassesPassed && curStart > now) {
                         const isInGap = prevEnd <= now && now < curStart;
                         const remainingMin = isInGap ? differenceInMinutes(curStart, now) : null;
                         const totalLabel = Math.floor(gapMin / 60) > 0

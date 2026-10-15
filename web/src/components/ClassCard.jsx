@@ -113,16 +113,16 @@ function Countdown({ start, end, isCancelled }) {
   const diffMin = differenceInMinutes(startDate, now);
   const diffHr = differenceInHours(startDate, now);
 
-  if (diffMin === 0) return <span className="text-xs font-bold text-emerald-400 animate-pulse">Teraz!</span>;
+  if (diffMin === 0) return <span className="text-xs font-bold text-emerald-400 animate-pulse whitespace-nowrap">Teraz!</span>;
   if (diffMin < 60)
     return (
-      <span className={`text-xs font-semibold ${diffMin <= 10 ? 'text-amber-400' : 'text-blue-400'}`}>
+      <span className={`text-xs font-semibold whitespace-nowrap ${diffMin <= 10 ? 'text-amber-400' : 'text-blue-400'}`}>
         za {diffMin} min
       </span>
     );
   if (diffHr < 24)
-    return <span className="text-xs text-gray-400">za {diffHr}h {diffMin % 60}min</span>;
-  return <span className="text-xs text-gray-500">{format(startDate, 'EEE d MMM', { locale: pl })}</span>;
+    return <span className="text-xs text-gray-400 whitespace-nowrap">za {diffHr}h {diffMin % 60}min</span>;
+  return <span className="text-xs text-gray-500 whitespace-nowrap">{format(startDate, 'EEE d MMM', { locale: pl })}</span>;
 }
 
 export default function ClassCard({ session, course, onClick, onEdit, compact = false }) {
@@ -306,9 +306,9 @@ export default function ClassCard({ session, course, onClick, onEdit, compact = 
           {/* Meta: time + AGH campus location / online mode */}
           {!compact && (
             <div className="flex flex-wrap items-center gap-2.5 text-xs text-gray-400 pt-0.5">
-              <span className="flex items-center gap-1 flex-shrink-0">
-                <Clock size={12} className="text-gray-400" />
-                {format(start, 'HH:mm')}–{format(end, 'HH:mm')}
+              <span className="flex items-center gap-1 flex-shrink-0 whitespace-nowrap font-mono">
+                <Clock size={12} className="text-gray-400 flex-shrink-0" />
+                <span className="text-gray-300 font-medium">{format(start, 'HH:mm')}–{format(end, 'HH:mm')}</span>
               </span>
 
               {isOnline ? (

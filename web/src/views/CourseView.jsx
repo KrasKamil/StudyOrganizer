@@ -8,7 +8,6 @@ import ClassCard from '../components/ClassCard';
 import RichHtmlDescription from '../components/RichHtmlDescription';
 import CourseModal from '../components/CourseModal';
 import SessionDetailModal from '../components/SessionDetailModal';
-import DiscordWidget from '../components/DiscordWidget';
 import TeamsWidget from '../components/TeamsWidget';
 import UpelWidget from '../components/UpelWidget';
 import {
@@ -45,7 +44,7 @@ export default function CourseView() {
   const course = courses.find((c) => c.id === courseId);
 
   const [activeTab, setActiveTab] = useState('Plan');
-  const [activeIntegration, setActiveIntegration] = useState('discord'); // 'discord' | 'teams' | 'upel'
+  const [activeIntegration, setActiveIntegration] = useState('teams'); // 'teams' | 'upel'
   const [dragOver, setDragOver] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedSessionForModal, setSelectedSessionForModal] = useState(null);
@@ -293,29 +292,7 @@ export default function CourseView() {
             );
           })()}
 
-          {/* Discord Channel Link */}
-          {course.discordUrl || course.discordChannelName ? (
-            <a
-              href={course.discordUrl || 'discord://'}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#5865F2]/20 border border-[#5865F2] hover:bg-[#5865F2]/30 text-indigo-300 text-xs font-semibold transition-colors shadow-sm"
-              title={`Otwórz kanał ${course.discordChannelName || ''} na serwerze Discord`}
-            >
-              <span>🎮</span>
-              <span>{course.discordChannelName || 'Discord'}</span>
-              <ExternalLink size={11} />
-            </a>
-          ) : (
-            <button
-              onClick={() => setShowEditModal(true)}
-              className="flex items-center gap-1 px-2 py-1.5 rounded-lg border border-dashed border-indigo-500/50 text-indigo-300 hover:bg-indigo-950/40 text-xs font-medium transition-colors"
-              title="Przypisz kanał z serwera Discord"
-            >
-              <Plus size={11} />
-              <span>Discord</span>
-            </button>
-          )}
+
 
           {/* Edit Button */}
           <button
@@ -450,18 +427,6 @@ export default function CourseView() {
             <div className="flex items-center gap-1.5 bg-gray-950 p-1 rounded-lg border border-gray-800">
               <button
                 type="button"
-                onClick={() => setActiveIntegration('discord')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${
-                  activeIntegration === 'discord'
-                    ? 'bg-[#5865F2] text-white shadow'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                <span>🎮</span>
-                <span>Discord</span>
-              </button>
-              <button
-                type="button"
                 onClick={() => setActiveIntegration('teams')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${
                   activeIntegration === 'teams'
@@ -492,7 +457,6 @@ export default function CourseView() {
           </div>
 
           {/* Active Interactive Widget */}
-          {activeIntegration === 'discord' && <DiscordWidget currentCourseId={courseId} />}
           {activeIntegration === 'teams' && <TeamsWidget currentCourseId={courseId} />}
           {activeIntegration === 'upel' && <UpelWidget currentCourseId={courseId} />}
 

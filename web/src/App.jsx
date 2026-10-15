@@ -7,13 +7,10 @@ import TodayView from './views/TodayView';
 import Sidebar from './components/Sidebar';
 import SettingsView from './views/SettingsView';
 import CourseView from './views/CourseView';
-import DiscordAuthCallback from './views/DiscordAuthCallback';
 import MicrosoftAuthCallback from './views/MicrosoftAuthCallback';
 
 import CalendarView from './views/CalendarView';
 import TasksView from './views/TasksView';
-import InboxView from './views/InboxView';
-import FloatingDashboardWindow from './components/FloatingDashboardWindow';
 import MobileBottomNav from './components/MobileBottomNav';
 import NotificationManager from './components/NotificationManager';
 import { useData } from './contexts/DataContext';
@@ -69,11 +66,9 @@ function AppShell() {
               <Route path="/today" element={<TodayView />} />
               <Route path="/calendar" element={<CalendarView />} />
               <Route path="/tasks" element={<TasksView />} />
-              <Route path="/inbox" element={<InboxView />} />
               <Route path="/settings" element={<SettingsView />} />
               <Route path="/course/:courseId" element={<CourseView />} />
             </Routes>
-            <FloatingDashboardWindow />
           </main>
           <MobileBottomNav onOpenMobileMenu={() => setMobileOpen(true)} />
         </div>
@@ -88,7 +83,6 @@ export default function App() {
       <AuthProvider>
         <Routes>
           {/* OAuth callback routes — outside the authenticated shell */}
-          <Route path="/auth/discord" element={<DiscordAuthCallback />} />
           <Route path="/auth/microsoft" element={<MicrosoftAuthCallback />} />
           {/* Everything else */}
           <Route path="/*" element={<AppShell />} />

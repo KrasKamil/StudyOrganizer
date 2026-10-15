@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
-  CalendarDays, Calendar, Inbox, CheckSquare, Settings, Plus,
+  CalendarDays, Calendar, CheckSquare, Settings, Plus,
   ChevronRight, BookOpen, GraduationCap, Check, Edit3, Layers, Sparkles, X, Download
 } from 'lucide-react';
 import { format } from 'date-fns';
@@ -47,7 +47,6 @@ export default function Sidebar({ mobileOpen = false, onCloseMobile = () => {} }
     updateSession,
     pinResource,
     initializeSemester2Courses,
-    openFloatingDashboard,
     theme,
     toggleTheme,
   } = useData();
@@ -167,24 +166,6 @@ export default function Sidebar({ mobileOpen = false, onCloseMobile = () => {} }
             badge={unreadTasks > 0 ? unreadTasks : null}
             onClick={onCloseMobile}
           />
-          <NavItem to="/inbox" icon={<Inbox size={15} />} label="Discord & Inbox" onClick={onCloseMobile} />
-          <button
-            type="button"
-            onClick={() => {
-              openFloatingDashboard('teams');
-              onCloseMobile();
-            }}
-            className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-gray-300 hover:text-white bg-gray-850 hover:bg-gray-800 border border-gray-750 transition-all mt-1 group shadow-xs text-left"
-            title="Otwórz okno w oknie: Prawdziwy panel Teams & UPeL AGH"
-          >
-            <div className="flex items-center gap-2">
-              <span className="text-sm">🪟</span>
-              <span>Okno w oknie</span>
-            </div>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-750 text-gray-200 font-bold group-hover:scale-105 transition-all">
-              Teams/UPeL
-            </span>
-          </button>
         </nav>
 
       {/* Dropped event converted to note feedback toast */}

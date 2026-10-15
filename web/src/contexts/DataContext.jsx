@@ -843,26 +843,7 @@ export function DataProvider({ children }) {
     [sessions]
   );
 
-  // Floating "Okno w oknie" dashboard state for real Teams, UPeL, and Discord
-  const [floatingWindow, setFloatingWindow] = useState({
-    isOpen: false,
-    service: 'teams', // 'teams' | 'upel' | 'discord'
-    customUrl: '',
-    courseId: null,
-  });
 
-  const openFloatingDashboard = useCallback((service = 'teams', customUrl = '', courseId = null) => {
-    setFloatingWindow({
-      isOpen: true,
-      service,
-      customUrl: customUrl || '',
-      courseId: courseId || null,
-    });
-  }, []);
-
-  const closeFloatingDashboard = useCallback(() => {
-    setFloatingWindow((prev) => ({ ...prev, isOpen: false }));
-  }, []);
 
   return (
     <DataContext.Provider
@@ -896,10 +877,6 @@ export function DataProvider({ children }) {
         addMessage,
         deleteMessage,
         getCourseSessions,
-        floatingWindow,
-        setFloatingWindow,
-        openFloatingDashboard,
-        closeFloatingDashboard,
         syncLocalDataToFirestore,
         theme,
         setTheme,

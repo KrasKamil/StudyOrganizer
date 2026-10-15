@@ -21,7 +21,7 @@ export default function LoginPage() {
 
         {/* Feature pills */}
         <div className="flex flex-wrap justify-center gap-2">
-          {['USOS iCal', 'Google Calendar', 'Microsoft Teams', 'Discord', 'Powiadomienia GPS'].map(
+          {['USOS iCal', 'Google Calendar', 'Microsoft Teams', 'UPeL AGH', 'Powiadomienia GPS'].map(
             (f) => (
               <span
                 key={f}
@@ -51,7 +51,7 @@ export default function LoginPage() {
 
           <p className="text-xs text-gray-600">
             Raz kliknij — aplikacja pozostaje zalogowana na stałe.<br />
-            Teams i Discord połączysz po zalogowaniu w Ustawieniach.
+            Wszystkie materiały i linki skonfigurujesz w Ustawieniach.
           </p>
         </div>
 

@@ -1,0 +1,473 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: {userId} (matches Firebase Auth UID)
+    // Fields:
+    //   - email: string (optional/nullable, <= 254 chars, valid email format)
+    //   - displayName: string (optional/nullable, <= 100 chars)
+    //   - photoURL: string (optional/nullable, <= 2000 chars, valid URL)
+    //   - lastSeen: timestamp (optional/nullable)
+    //   - createdAt: timestamp (optional/nullable)
+    //
+    // Subcollection: users/{userId}/devices
+    // Document ID: {deviceId}
+    // Fields:
+    //   - fcmToken: string (required, 1-1024 chars)
+    //   - userAgent: string (optional/nullable, <= 500 chars)
+    //   - platform: string (optional/nullable, <= 100 chars)
+    //   - updatedAt: timestamp (optional/nullable)
+    //   - enabled: bool (optional/nullable)
+    //
+    // Collection: tokens
+    // Document ID: {userId} (matches Firebase Auth UID)
+    // Fields:
+    //   - googleCalendar: map or string (optional/nullable, OAuth access token and metadata)
+    //   - discord: map (optional/nullable, OAuth tokens and metadata)
+    //   - microsoft: map (optional/nullable, OAuth tokens and metadata)
+    //   - updatedAt: timestamp (optional/nullable)
+    //   - createdAt: timestamp (optional/nullable)
+    //
+    // Collection: courses
+    // Document ID: auto-generated or custom string ID
+    // Fields:
+    //   - uid: string (required, immutable, matches request.auth.uid)
+    //   - name: string (required, 1-200 chars)
+    //   - color: string (optional/nullable, <= 50 chars)
+    //   - type: string (optional/nullable, <= 50 chars)
+    //   - discordChannelId: string (optional/nullable, <= 100 chars)
+    //   - discordChannelName: string (optional/nullable, <= 100 chars)
+    //   - discordUrl: string (optional/nullable, <= 2000 chars)
+    //   - discordServerName: string (optional/nullable, <= 200 chars)
+    //   - teamsChannelId: string (optional/nullable, <= 200 chars)
+    //   - teamsUrl: string (optional/nullable, <= 2000 chars)
+    //   - upelUrl: string (optional/nullable, <= 2000 chars)
+    //   - upelWykUrl: string (optional/nullable, <= 2000 chars)
+    //   - upelLabUrl: string (optional/nullable, <= 2000 chars)
+    //   - upelProjUrl: string (optional/nullable, <= 2000 chars)
+    //   - resources: list (optional/nullable, <= 150 items)
+    //   - createdAt: timestamp (optional/nullable, immutable)
+    //   - updatedAt: timestamp (optional/nullable)
+    //
+    // Collection: sessions
+    // Document ID: auto-generated or custom string ID
+    // Fields:
+    //   - uid: string (required, immutable, matches request.auth.uid)
+    //   - title: string (required, 1-300 chars)
+    //   - courseId: string (optional/nullable, <= 100 chars)
+    //   - start: timestamp or string (optional/nullable, <= 100 chars)
+    //   - end: timestamp or string (optional/nullable, <= 100 chars)
+    //   - mode: string (optional/nullable, <= 50 chars)
+    //   - location: string (optional/nullable, <= 300 chars)
+    //   - teamsLink: string (optional/nullable, <= 2000 chars)
+    //   - upelUrl: string (optional/nullable, <= 2000 chars)
+    //   - source: string (optional/nullable, <= 50 chars)
+    //   - category: string (optional/nullable, <= 50 chars)
+    //   - isCancelled: bool (optional/nullable)
+    //   - isHidden: bool (optional/nullable)
+    //   - isConvertedToNote: bool (optional/nullable)
+    //   - note: string (optional/nullable, <= 5000 chars)
+    //   - studentNotes: string (optional/nullable, <= 5000 chars)
+    //   - customSlotTime: string (optional/nullable, <= 50 chars)
+    //   - customSlotDuration: string or number (optional/nullable)
+    //   - customSlotMode: string (optional/nullable, <= 50 chars)
+    //   - customSlotLocation: string (optional/nullable, <= 300 chars)
+    //   - topicsToSend: string (optional/nullable, <= 5000 chars)
+    //   - createdAt: timestamp or string (optional/nullable)
+    //   - updatedAt: timestamp (optional/nullable)
+    //
+    // Collection: tasks
+    // Document ID: auto-generated string ID
+    // Fields:
+    //   - uid: string (required, immutable, matches request.auth.uid)
+    //   - title: string (required, 1-500 chars)
+    //   - done: bool (required)
+    //   - courseId: string (optional/nullable, <= 100 chars)
+    //   - sessionId: string (optional/nullable, <= 200 chars)
+    //   - sessionTitle: string (optional/nullable, <= 300 chars)
+    //   - deadline: timestamp or string (optional/nullable, <= 100 chars)
+    //   - priority: string (optional/nullable, <= 50 chars)
+    //   - note: string (optional/nullable, <= 3000 chars)
+    //   - doneAt: timestamp (optional/nullable)
+    //   - createdAt: timestamp (optional/nullable, immutable)
+    //   - updatedAt: timestamp (optional/nullable)
+    //
+    // Collection: session_overrides
+    // Document ID: composite string {uid}_{sessionId}
+    // Fields:
+    //   - uid: string (required, immutable, matches request.auth.uid)
+    //   - sessionId: string (required, immutable, 1-300 chars)
+    //   - title: string (optional/nullable, <= 300 chars)
+    //   - start: timestamp or string (optional/nullable, <= 100 chars)
+    //   - end: timestamp or string (optional/nullable, <= 100 chars)
+    //   - category: string (optional/nullable, <= 50 chars)
+    //   - mode: string (optional/nullable, <= 50 chars)
+    //   - location: string (optional/nullable, <= 300 chars)
+    //   - teamsLink: string (optional/nullable, <= 2000 chars)
+    //   - upelUrl: string (optional/nullable, <= 2000 chars)
+    //   - courseId: string (optional/nullable, <= 100 chars)
+    //   - studentNotes: string (optional/nullable, <= 5000 chars)
+    //   - note: string (optional/nullable, <= 5000 chars)
+    //   - customSlotTime: string (optional/nullable, <= 50 chars)
+    //   - customSlotDuration: string or number (optional/nullable)
+    //   - customSlotMode: string (optional/nullable, <= 50 chars)
+    //   - customSlotLocation: string (optional/nullable, <= 300 chars)
+    //   - topicsToSend: string (optional/nullable, <= 5000 chars)
+    //   - isCancelled: bool (optional/nullable)
+    //   - isHidden: bool (optional/nullable)
+    //   - isConvertedToNote: bool (optional/nullable)
+    //   - updatedAt: timestamp (optional/nullable)
+    //   - createdAt: timestamp (optional/nullable)
+    //
+    // Collection: messages
+    // Document ID: auto-generated string ID
+    // Fields:
+    //   - uid: string (required, immutable, matches request.auth.uid)
+    //   - content: string (required, 1-5000 chars)
+    //   - courseId: string (optional/nullable, <= 100 chars)
+    //   - author: string (optional/nullable, <= 100 chars)
+    //   - source: string (optional/nullable, <= 50 chars)
+    //   - channelName: string (optional/nullable, <= 100 chars)
+    //   - url: string (optional/nullable, <= 2000 chars)
+    //   - timestamp: timestamp or string (optional/nullable, <= 100 chars)
+    //   - createdAt: timestamp (optional/nullable, immutable)
+    //   - updatedAt: timestamp (optional/nullable)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.uid;
+    }
+
+    function uidNotModified() {
+      return !('uid' in request.resource.data) ||
+        request.resource.data.uid == resource.data.uid;
+    }
+
+    function hasOnlyAllowedFields(data, fields) {
+      return data.keys().hasOnly(fields);
+    }
+
+    function areImmutableFieldsUnchanged(fields) {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields) ||
+             (fields.hasOnly(['sessionId']) && (!('sessionId' in request.resource.data) || request.resource.data.sessionId == resource.data.sessionId)) ||
+             (fields.hasOnly(['createdAt']) && (!('createdAt' in resource.data) || request.resource.data.createdAt == resource.data.createdAt));
+    }
+
+    function isValidEmail(email) {
+      return email is string &&
+        email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    function isValidUrl(url) {
+      return url is string &&
+        (url.matches("^https://.*") || url.matches("^http://.*") || url.matches("^discord://.*"));
+    }
+
+    function isValidOptionalString(data, field, maxLen) {
+      return !(field in data) || data[field] == null ||
+        (data[field] is string && data[field].size() <= maxLen);
+    }
+
+    function isValidRequiredString(data, field, minLen, maxLen) {
+      return field in data && data[field] is string &&
+        data[field].size() >= minLen && data[field].size() <= maxLen;
+    }
+
+    function isValidOptionalTimestamp(data, field) {
+      return !(field in data) || data[field] == null || data[field] is timestamp;
+    }
+
+    function isValidTimeField(data, field) {
+      return !(field in data) || data[field] == null ||
+        data[field] is timestamp ||
+        (data[field] is string && data[field].size() <= 100);
+    }
+
+    function isValidOptionalBool(data, field) {
+      return !(field in data) || data[field] == null || data[field] is bool;
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidUser(data) {
+      return hasOnlyAllowedFields(data, ['email', 'displayName', 'photoURL', 'lastSeen', 'createdAt']) &&
+        isValidOptionalString(data, 'displayName', 100) &&
+        isValidOptionalString(data, 'photoURL', 2000) &&
+        isValidOptionalTimestamp(data, 'lastSeen') &&
+        isValidOptionalTimestamp(data, 'createdAt') &&
+        (!('email' in data) || data.email == null || (data.email is string && data.email.size() <= 254 && isValidEmail(data.email))) &&
+        (!('photoURL' in data) || data.photoURL == null || isValidUrl(data.photoURL));
+    }
+
+    function isValidDevice(data) {
+      return hasOnlyAllowedFields(data, ['fcmToken', 'userAgent', 'platform', 'updatedAt', 'enabled']) &&
+        isValidRequiredString(data, 'fcmToken', 1, 1024) &&
+        isValidOptionalString(data, 'userAgent', 500) &&
+        isValidOptionalString(data, 'platform', 100) &&
+        isValidOptionalTimestamp(data, 'updatedAt') &&
+        isValidOptionalBool(data, 'enabled');
+    }
+
+    function isValidTokens(data) {
+      return hasOnlyAllowedFields(data, ['googleCalendar', 'discord', 'microsoft', 'updatedAt', 'createdAt']) &&
+        isValidOptionalTimestamp(data, 'updatedAt') &&
+        isValidOptionalTimestamp(data, 'createdAt') &&
+        (!('googleCalendar' in data) || data.googleCalendar == null ||
+          (data.googleCalendar is string && data.googleCalendar.size() <= 4096) ||
+          (data.googleCalendar is map && data.googleCalendar.size() <= 20)) &&
+        (!('discord' in data) || data.discord == null ||
+          (data.discord is map && data.discord.size() <= 20)) &&
+        (!('microsoft' in data) || data.microsoft == null ||
+          (data.microsoft is map && data.microsoft.size() <= 20));
+    }
+
+    function isValidCourse(data) {
+      return hasOnlyAllowedFields(data, [
+        'uid', 'name', 'color', 'type', 'discordChannelId', 'discordChannelName',
+        'discordUrl', 'discordServerName', 'teamsChannelId', 'teamsUrl',
+        'upelUrl', 'upelWykUrl', 'upelLabUrl', 'upelProjUrl', 'resources',
+        'createdAt', 'updatedAt'
+      ]) &&
+      data.uid is string && data.uid == request.auth.uid &&
+      isValidRequiredString(data, 'name', 1, 200) &&
+      isValidOptionalString(data, 'color', 50) &&
+      isValidOptionalString(data, 'type', 50) &&
+      isValidOptionalString(data, 'discordChannelId', 100) &&
+      isValidOptionalString(data, 'discordChannelName', 100) &&
+      isValidOptionalString(data, 'discordUrl', 2000) &&
+      isValidOptionalString(data, 'discordServerName', 200) &&
+      isValidOptionalString(data, 'teamsChannelId', 200) &&
+      isValidOptionalString(data, 'teamsUrl', 2000) &&
+      isValidOptionalString(data, 'upelUrl', 2000) &&
+      isValidOptionalString(data, 'upelWykUrl', 2000) &&
+      isValidOptionalString(data, 'upelLabUrl', 2000) &&
+      isValidOptionalString(data, 'upelProjUrl', 2000) &&
+      (!('resources' in data) || data.resources == null || (data.resources is list && data.resources.size() <= 150)) &&
+      isValidOptionalTimestamp(data, 'createdAt') &&
+      isValidOptionalTimestamp(data, 'updatedAt');
+    }
+
+    function isValidSession(data) {
+      return hasOnlyAllowedFields(data, [
+        'uid', 'courseId', 'title', 'start', 'end', 'mode', 'location',
+        'teamsLink', 'upelUrl', 'source', 'category', 'isCancelled', 'isHidden',
+        'isConvertedToNote', 'note', 'studentNotes', 'customSlotTime',
+        'customSlotDuration', 'customSlotMode', 'customSlotLocation', 'topicsToSend',
+        'createdAt', 'updatedAt'
+      ]) &&
+      data.uid is string && data.uid == request.auth.uid &&
+      isValidRequiredString(data, 'title', 1, 300) &&
+      isValidOptionalString(data, 'courseId', 100) &&
+      isValidTimeField(data, 'start') &&
+      isValidTimeField(data, 'end') &&
+      isValidOptionalString(data, 'mode', 50) &&
+      isValidOptionalString(data, 'location', 300) &&
+      isValidOptionalString(data, 'teamsLink', 2000) &&
+      isValidOptionalString(data, 'upelUrl', 2000) &&
+      isValidOptionalString(data, 'source', 50) &&
+      isValidOptionalString(data, 'category', 50) &&
+      isValidOptionalBool(data, 'isCancelled') &&
+      isValidOptionalBool(data, 'isHidden') &&
+      isValidOptionalBool(data, 'isConvertedToNote') &&
+      isValidOptionalString(data, 'note', 5000) &&
+      isValidOptionalString(data, 'studentNotes', 5000) &&
+      isValidOptionalString(data, 'customSlotTime', 50) &&
+      (!('customSlotDuration' in data) || data.customSlotDuration == null ||
+        (data.customSlotDuration is string && data.customSlotDuration.size() <= 20) ||
+        (data.customSlotDuration is number && data.customSlotDuration > 0 && data.customSlotDuration <= 1440)) &&
+      isValidOptionalString(data, 'customSlotMode', 50) &&
+      isValidOptionalString(data, 'customSlotLocation', 300) &&
+      isValidOptionalString(data, 'topicsToSend', 5000) &&
+      isValidTimeField(data, 'createdAt') &&
+      isValidOptionalTimestamp(data, 'updatedAt');
+    }
+
+    function isValidTask(data) {
+      return hasOnlyAllowedFields(data, [
+        'uid', 'title', 'courseId', 'sessionId', 'sessionTitle',
+        'deadline', 'priority', 'note', 'done', 'doneAt', 'createdAt', 'updatedAt'
+      ]) &&
+      data.uid is string && data.uid == request.auth.uid &&
+      isValidRequiredString(data, 'title', 1, 500) &&
+      data.done is bool &&
+      isValidOptionalString(data, 'courseId', 100) &&
+      isValidOptionalString(data, 'sessionId', 200) &&
+      isValidOptionalString(data, 'sessionTitle', 300) &&
+      isValidTimeField(data, 'deadline') &&
+      isValidOptionalString(data, 'priority', 50) &&
+      isValidOptionalString(data, 'note', 3000) &&
+      isValidOptionalTimestamp(data, 'doneAt') &&
+      isValidOptionalTimestamp(data, 'createdAt') &&
+      isValidOptionalTimestamp(data, 'updatedAt');
+    }
+
+    function isValidSessionOverride(data) {
+      return hasOnlyAllowedFields(data, [
+        'uid', 'sessionId', 'title', 'start', 'end', 'category', 'mode',
+        'location', 'teamsLink', 'upelUrl', 'courseId', 'studentNotes', 'note',
+        'customSlotTime', 'customSlotDuration', 'customSlotMode', 'customSlotLocation',
+        'topicsToSend', 'isCancelled', 'isHidden', 'isConvertedToNote',
+        'updatedAt', 'createdAt'
+      ]) &&
+      data.uid is string && data.uid == request.auth.uid &&
+      isValidRequiredString(data, 'sessionId', 1, 300) &&
+      isValidOptionalString(data, 'title', 300) &&
+      isValidTimeField(data, 'start') &&
+      isValidTimeField(data, 'end') &&
+      isValidOptionalString(data, 'category', 50) &&
+      isValidOptionalString(data, 'mode', 50) &&
+      isValidOptionalString(data, 'location', 300) &&
+      isValidOptionalString(data, 'teamsLink', 2000) &&
+      isValidOptionalString(data, 'upelUrl', 2000) &&
+      isValidOptionalString(data, 'courseId', 100) &&
+      isValidOptionalString(data, 'studentNotes', 5000) &&
+      isValidOptionalString(data, 'note', 5000) &&
+      isValidOptionalString(data, 'customSlotTime', 50) &&
+      (!('customSlotDuration' in data) || data.customSlotDuration == null ||
+        (data.customSlotDuration is string && data.customSlotDuration.size() <= 20) ||
+        (data.customSlotDuration is number && data.customSlotDuration > 0 && data.customSlotDuration <= 1440)) &&
+      isValidOptionalString(data, 'customSlotMode', 50) &&
+      isValidOptionalString(data, 'customSlotLocation', 300) &&
+      isValidOptionalString(data, 'topicsToSend', 5000) &&
+      isValidOptionalBool(data, 'isCancelled') &&
+      isValidOptionalBool(data, 'isHidden') &&
+      isValidOptionalBool(data, 'isConvertedToNote') &&
+      isValidOptionalTimestamp(data, 'updatedAt') &&
+      isValidOptionalTimestamp(data, 'createdAt');
+    }
+
+    function isValidMessage(data) {
+      return hasOnlyAllowedFields(data, [
+        'uid', 'courseId', 'content', 'author', 'source', 'channelName',
+        'url', 'timestamp', 'createdAt', 'updatedAt'
+      ]) &&
+      data.uid is string && data.uid == request.auth.uid &&
+      isValidRequiredString(data, 'content', 1, 5000) &&
+      isValidOptionalString(data, 'courseId', 100) &&
+      isValidOptionalString(data, 'author', 100) &&
+      isValidOptionalString(data, 'source', 50) &&
+      isValidOptionalString(data, 'channelName', 100) &&
+      isValidOptionalString(data, 'url', 2000) &&
+      isValidTimeField(data, 'timestamp') &&
+      isValidOptionalTimestamp(data, 'createdAt') &&
+      isValidOptionalTimestamp(data, 'updatedAt');
+    }
+
+    // ===============================================================
+    // Rules Definition
+    // ===============================================================
+
+    // Default Deny: Deny all reads and writes by default across the database
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 1. users: user profile document by doc ID user.uid
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data);
+      allow delete: if isOwner(userId);
+
+      // Subcollection: devices registered for push notifications
+      match /devices/{deviceId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidDevice(request.resource.data);
+        allow update: if isOwner(userId) && isValidDevice(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+    }
+
+    // 2. tokens: OAuth tokens document by doc ID user.uid
+    match /tokens/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidTokens(request.resource.data);
+      allow update: if isOwner(userId) && isValidTokens(request.resource.data);
+      allow delete: if isOwner(userId);
+    }
+
+    // 3. courses: user courses with uid field
+    match /courses/{courseId} {
+      allow read: if isDocOwner();
+      allow create: if isAuthenticated() &&
+                    request.resource.data.uid == request.auth.uid &&
+                    isValidCourse(request.resource.data);
+      allow update: if isDocOwner() &&
+                    uidNotModified() &&
+                    areImmutableFieldsUnchanged(['createdAt']) &&
+                    isValidCourse(request.resource.data);
+      allow delete: if isDocOwner();
+    }
+
+    // 4. sessions: user calendar schedule sessions with uid field
+    match /sessions/{sessionId} {
+      allow read: if isDocOwner();
+      allow create: if isAuthenticated() &&
+                    request.resource.data.uid == request.auth.uid &&
+                    isValidSession(request.resource.data);
+      allow update: if isDocOwner() &&
+                    uidNotModified() &&
+                    isValidSession(request.resource.data);
+      allow delete: if isDocOwner();
+    }
+
+    // 5. tasks: student tasks with uid field
+    match /tasks/{taskId} {
+      allow read: if isDocOwner();
+      allow create: if isAuthenticated() &&
+                    request.resource.data.uid == request.auth.uid &&
+                    isValidTask(request.resource.data);
+      allow update: if isDocOwner() &&
+                    uidNotModified() &&
+                    areImmutableFieldsUnchanged(['createdAt']) &&
+                    isValidTask(request.resource.data);
+      allow delete: if isDocOwner();
+    }
+
+    // 6. session_overrides: calendar session overrides with uid field
+    match /session_overrides/{overrideId} {
+      allow read: if isDocOwner();
+      allow create: if isAuthenticated() &&
+                    request.resource.data.uid == request.auth.uid &&
+                    isValidSessionOverride(request.resource.data);
+      allow update: if isDocOwner() &&
+                    uidNotModified() &&
+                    areImmutableFieldsUnchanged(['sessionId']) &&
+                    isValidSessionOverride(request.resource.data);
+      allow delete: if isDocOwner();
+    }
+
+    // 7. messages: announcements with uid field
+    match /messages/{messageId} {
+      allow read: if isDocOwner();
+      allow create: if isAuthenticated() &&
+                    request.resource.data.uid == request.auth.uid &&
+                    isValidMessage(request.resource.data);
+      allow update: if isDocOwner() &&
+                    uidNotModified() &&
+                    areImmutableFieldsUnchanged(['createdAt']) &&
+                    isValidMessage(request.resource.data);
+      allow delete: if isDocOwner();
+    }
+  }
+}

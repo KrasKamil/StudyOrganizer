@@ -1,5 +1,5 @@
 import { format, differenceInMinutes, isBefore, isAfter } from 'date-fns';
-import { AGH_BUILDING_DETAILS } from './aghCampus';
+import { AGH_BUILDING_DETAILS } from './aghCampus.js';
 
 // ── PRESET LOCATIONS ──────────────────────────────────────────────────────────
 export const MOGILSKA_HOME = {
@@ -17,13 +17,15 @@ export const PRESET_ORIGINS = {
   home: MOGILSKA_HOME,
   girlfriend: {
     id: 'girlfriend',
-    name: 'U dziewczyny (Bieżący GPS)',
-    shortName: '❤️ U dziewczyny (GPS)',
-    address: 'Aktualna pozycja w telefonie/przeglądarce',
-    coords: null,
-    defaultCommuteMinutes: 30, // Średnio 30 min dojazdu na zajęcia (zwłaszcza rano)
+    name: 'U dziewczyny: ul. Głowackiego (Bronowice)',
+    shortName: '❤️ U dziewczyny (Głowackiego)',
+    address: 'Przystanek Głowackiego, Kraków',
+    transitStop: 'Głowackiego',
+    coords: { lat: 50.0768, lng: 19.9015 }, // Przystanek tramwajowy MPK Głowackiego
+    defaultCommuteMinutes: 20, // tramwaj do Biprostalu + przesiadka w autobus na Chopina/Czarnowiejską
+    floorBufferMinutes: 0,
     icon: '❤️',
-    desc: 'Lokalizacja GPS: średnio 30 min dojazdu rano',
+    desc: 'Start: Przystanek Głowackiego → Biprostal → Chopina / Czarnowiejska (~18-22 min)',
   },
   gps: {
     id: 'gps',
@@ -180,30 +182,76 @@ export function buildJakdojadeUrl({
   session,
   destinationCoords,
   destinationName,
+  transitStop,
+  walkFromStopMinutes = 0,
+  insideMinutes = 0,
   originCoords,
   originName,
   city = 'krakow',
+  aghLoc = null,
 }) {
   const start = session?.start?.toDate?.() || (session?.start ? new Date(session.start) : new Date());
-  const dateFormatted = format(start, 'dd.MM.yy');
-  const timeFormatted = format(start, 'HH:mm');
 
-  // Destination point
-  const destLat = destinationCoords?.lat || AGH_CAMPUS_CENTER.lat;
-  const destLng = destinationCoords?.lng || AGH_CAMPUS_CENTER.lng;
-  const destNameParam = destinationName ? `&tsn=${encodeURIComponent(destinationName)}` : '';
+  // 1. Resolve destination transit stop and walking/stairs buffer
+  const stop = transitStop || aghLoc?.transitStop || destinationName || 'AGH / UR';
+  const walkMinutes = walkFromStopMinutes || aghLoc?.walkFromStopMinutes || 2;
+  const stairsMinutes = insideMinutes || aghLoc?.insideMinutes || 1;
+  const totalLeadToSeat = walkMinutes + stairsMinutes;
 
-  // Origin point
-  let originParam = '';
-  if (originCoords?.lat && originCoords?.lng) {
-    originParam = `&fc=${originCoords.lat}:${originCoords.lng}`;
-    if (originName) {
-      originParam += `&fsn=${encodeURIComponent(originName)}`;
+  // 2. Adjust target arrival time AT THE STOP:
+  // We want the MPK tram/bus to arrive at the stop early enough to allow walking to the building and climbing stairs!
+  const targetStopArrivalDate = new Date(start.getTime() - totalLeadToSeat * 60 * 1000);
+  const dateFormatted = format(targetStopArrivalDate, 'dd.MM.yy');
+  const timeFormatted = format(targetStopArrivalDate, 'HH:mm');
+
+  // 3. Destination coordinates
+  const destCoords = destinationCoords || aghLoc?.coords || AGH_CAMPUS_CENTER;
+  const destLat = destCoords?.lat || AGH_CAMPUS_CENTER.lat;
+  const destLng = destCoords?.lng || AGH_CAMPUS_CENTER.lng;
+
+  // 4. Origin point (fallback to stored transit preferences if not passed)
+  let finalOriginCoords = originCoords;
+  let finalOriginName = originName;
+  if (!finalOriginCoords || !finalOriginName) {
+    try {
+      const prefs = getStoredTransitPreferences();
+      if (prefs.originType === 'girlfriend' || prefs.originType === 'gps') {
+        finalOriginCoords = prefs.lastGps;
+        finalOriginName = 'Bieżąca lokalizacja';
+      } else if (prefs.originType === 'miasteczko') {
+        finalOriginCoords = PRESET_ORIGINS.miasteczko.coords;
+        finalOriginName = PRESET_ORIGINS.miasteczko.address;
+      } else if (prefs.originType === 'custom') {
+        finalOriginCoords = prefs.customCoords || MOGILSKA_HOME.coords;
+        finalOriginName = prefs.customAddress || MOGILSKA_HOME.address;
+      } else {
+        // Default: 'home' (Mogilska 23)
+        finalOriginCoords = MOGILSKA_HOME.coords;
+        finalOriginName = MOGILSKA_HOME.address;
+      }
+    } catch {
+      // In non-browser environments
     }
   }
 
-  // ia=true (is arrival = arrive before class starts at time 'h')
-  return `https://jakdojade.pl/${city}/trasa?tc=${destLat}:${destLng}${destNameParam}${originParam}&d=${dateFormatted}&h=${timeFormatted}&ia=true`;
+  let originParam = '';
+  if (finalOriginCoords?.lat && finalOriginCoords?.lng) {
+    originParam += `&fc=${finalOriginCoords.lat}:${finalOriginCoords.lng}`;
+  }
+  if (finalOriginName) {
+    originParam += `&fn=${encodeURIComponent(finalOriginName)}`;
+  }
+
+  // Jakdojade official query parameters:
+  // tc: destination coords (lat:lng)
+  // tn: destination stop name (e.g. "Czarnowiejska", "AGH / UR", "Kawiory", "Miasteczko Studenckie AGH")
+  // fc: origin coords
+  // fn: origin name
+  // d: dd.MM.yy
+  // h: HH:mm (target arrival time at stop!)
+  // ia: true (arrive by)
+  // t: 0 (optimal route)
+  return `https://jakdojade.pl/${city}/trasa?tc=${destLat}:${destLng}&tn=${encodeURIComponent(stop)}${originParam}&d=${dateFormatted}&h=${timeFormatted}&ia=true&t=0`;
 }
 
 // ── GOOGLE MAPS DIRECTIONS URL GENERATOR ────────────────────────────────────
@@ -218,9 +266,27 @@ export function buildGoogleMapsUrl({
     ? `${destinationCoords.lat},${destinationCoords.lng}`
     : (destinationName ? encodeURIComponent(destinationName + ' AGH Kraków') : `${AGH_CAMPUS_CENTER.lat},${AGH_CAMPUS_CENTER.lng}`);
 
+  let finalOriginCoords = originCoords;
+  if (!finalOriginCoords) {
+    try {
+      const prefs = getStoredTransitPreferences();
+      if (prefs.originType === 'girlfriend' || prefs.originType === 'gps') {
+        finalOriginCoords = prefs.lastGps;
+      } else if (prefs.originType === 'miasteczko') {
+        finalOriginCoords = PRESET_ORIGINS.miasteczko.coords;
+      } else if (prefs.originType === 'custom') {
+        finalOriginCoords = prefs.customCoords || MOGILSKA_HOME.coords;
+      } else {
+        finalOriginCoords = MOGILSKA_HOME.coords;
+      }
+    } catch {
+      // Non-browser fallback
+    }
+  }
+
   let originCoordStr = '';
-  if (originCoords?.lat && originCoords?.lng) {
-    originCoordStr = `&origin=${originCoords.lat},${originCoords.lng}`;
+  if (finalOriginCoords?.lat && finalOriginCoords?.lng) {
+    originCoordStr = `&origin=${finalOriginCoords.lat},${finalOriginCoords.lng}`;
   }
 
   // Standard Google Maps Turn-by-Turn directions URL

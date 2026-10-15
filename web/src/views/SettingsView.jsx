@@ -4,9 +4,10 @@ import { useData } from '../contexts/DataContext';
 import {
   Link2, CheckCircle2, Circle, ExternalLink,
   RefreshCw, AlertTriangle, Disc, Users, Calendar,
-  Check, Save, MessageSquare
+  Check, Save, MessageSquare, Smartphone, Download
 } from 'lucide-react';
 import CommuteNotificationSettings from '../components/CommuteNotificationSettings';
+import { usePwaInstall } from '../hooks/usePwaInstall';
 
 function getDefaultChannelName(courseName = '') {
   const norm = courseName.toLowerCase();
@@ -47,6 +48,7 @@ export default function SettingsView() {
     calendarCourseFilter,
     setCalendarCourseFilter,
   } = useData();
+  const { isInstallable, isStandalone, installApp } = usePwaInstall();
 
   const [usosUrl, setUsosUrl] = useState(() => localStorage.getItem('usosIcalUrl') || '');
   const [syncing, setSyncing] = useState(false);
@@ -361,6 +363,58 @@ export default function SettingsView() {
       {/* ── POWIADOMIENIA PUSH & CZAS DOJAZDU ── */}
       <Section title="🔔 Powiadomienia na telefonie & Czas Dojazdu">
         <CommuteNotificationSettings />
+      </Section>
+
+      {/* ── PROGRESSIVE WEB APP (PWA) & OFFLINE ── */}
+      <Section title="📱 Aplikacja Mobilna i PWA (Progressive Web App)">
+        <div className="p-4 rounded-xl bg-gray-850/80 border border-gray-750 space-y-4 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Smartphone className="text-indigo-400" size={18} />
+                <p className="text-sm font-bold text-white">Status aplikacji (PWA)</p>
+                <StatusBadge
+                  connected={isStandalone}
+                  label={isStandalone ? 'Zainstalowana' : (isInstallable ? 'Gotowa do instalacji' : 'W przeglądarce')}
+                />
+              </div>
+              <p className="text-xs text-gray-400">
+                StudyOrganizer może działać jako pełnoekranowa aplikacja na Twoim telefonie (Android, iOS) lub komputerze, z obsługą powiadomień i trybu offline.
+              </p>
+            </div>
+
+            {!isStandalone && (
+              <button
+                type="button"
+                onClick={installApp}
+                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-2 flex-shrink-0"
+              >
+                <Download size={14} />
+                <span>Zainstaluj aplikację</span>
+              </button>
+            )}
+          </div>
+
+          <div className="pt-3 border-t border-gray-750/70 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <div className="p-3 rounded-lg bg-gray-900/60 border border-gray-800 space-y-1">
+              <p className="font-semibold text-gray-200 flex items-center gap-1.5">
+                <span>⚡</span> Pamięć podręczna i tryb offline
+              </p>
+              <p className="text-gray-400 text-[11px] leading-relaxed">
+                Service Worker automatycznie zapisuje szkielet aplikacji (App Shell). Aplikacja otwiera się natychmiast nawet przy braku połączenia z siecią.
+              </p>
+            </div>
+
+            <div className="p-3 rounded-lg bg-gray-900/60 border border-gray-800 space-y-1">
+              <p className="font-semibold text-gray-200 flex items-center gap-1.5">
+                <span>📲</span> Dodawanie do ekranu głównego
+              </p>
+              <p className="text-gray-400 text-[11px] leading-relaxed">
+                Na iPhone/iPad kliknij <strong>Udostępnij</strong> w Safari i wybierz <strong>Do ekranu początkowego</strong>. Na Androidzie/Chrome kliknij przycisk instalacji powyżej.
+              </p>
+            </div>
+          </div>
+        </div>
       </Section>
 
       {/* ── CLOUD FIRESTORE SYNC: PC <-> Mobile ── */}

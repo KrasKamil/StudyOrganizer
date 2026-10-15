@@ -143,10 +143,14 @@ export default function TodayView() {
     if (!heroSession || heroIsOnline) return null;
     return buildJakdojadeUrl({
       session: heroSession,
+      aghLoc: heroAghLoc,
       destinationCoords: heroAghLoc?.coords,
-      destinationName: heroAghLoc?.building ? `AGH Budynek ${heroAghLoc.building}` : heroSession.location,
+      destinationName: heroAghLoc?.transitStop || (heroAghLoc?.building ? `AGH Budynek ${heroAghLoc.building}` : heroSession.location),
+      transitStop: heroAghLoc?.transitStop,
+      walkFromStopMinutes: heroAghLoc?.walkFromStopMinutes,
+      insideMinutes: heroAghLoc?.insideMinutes,
       originCoords: MOGILSKA_HOME.coords,
-      originName: 'Mogilska 23, Kraków',
+      originName: 'ul. Mogilska 23, Kraków',
     });
   }, [heroSession, heroIsOnline, heroAghLoc]);
 

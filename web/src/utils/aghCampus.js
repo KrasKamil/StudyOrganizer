@@ -17,7 +17,8 @@ export const AGH_BUILDING_DETAILS = {
     name: 'Centrum Informatyki AGH',
     faculty: 'Wydział Informatyki / WIEiT',
     address: 'ul. Kawiory 21, Kraków',
-    transitStop: 'Kawiory / Czarnowiejska',
+    transitStop: 'Kawiory',
+    stopWalkMinutes: 2,
     entryTip: 'Główne wejście od strony ul. Kawiory, łącznik z D-10',
     coords: { lat: 50.0673, lng: 19.9130 },
   },
@@ -25,7 +26,8 @@ export const AGH_BUILDING_DETAILS = {
     name: 'Pawilon C-2',
     faculty: 'Wydział Informatyki, Elektroniki i Telekomunikacji (WIEiT)',
     address: 'al. Adama Mickiewicza 30, Kraków',
-    transitStop: 'AGH / UR (al. Mickiewicza) lub Czarnowiejska',
+    transitStop: 'Czarnowiejska',
+    stopWalkMinutes: 3,
     entryTip: 'Skrzydło C, wejście z dziedzińca głównego AGH',
     coords: { lat: 50.0655, lng: 19.9197 },
   },
@@ -33,7 +35,8 @@ export const AGH_BUILDING_DETAILS = {
     name: 'Pawilon C-3',
     faculty: 'Wydział Informatyki, Elektroniki i Telekomunikacji',
     address: 'al. Adama Mickiewicza 30, Kraków',
-    transitStop: 'AGH / UR',
+    transitStop: 'Czarnowiejska',
+    stopWalkMinutes: 3,
     entryTip: 'Kompleks budynków C przy miasteczku/ul. Czarnowiejskiej',
     coords: { lat: 50.0658, lng: 19.9186 },
   },
@@ -42,6 +45,7 @@ export const AGH_BUILDING_DETAILS = {
     faculty: 'Wydział WIEiT / EAIiIB',
     address: 'al. Adama Mickiewicza 30, Kraków',
     transitStop: 'AGH / UR',
+    stopWalkMinutes: 3,
     entryTip: 'Skrzydło C przy al. Mickiewicza',
     coords: { lat: 50.0651, lng: 19.9208 },
   },
@@ -50,6 +54,7 @@ export const AGH_BUILDING_DETAILS = {
     faculty: 'Wydział WIEiT',
     address: 'al. Adama Mickiewicza 30, Kraków',
     transitStop: 'Czarnowiejska',
+    stopWalkMinutes: 3,
     entryTip: 'Kompleks C w głębi kampusu',
     coords: { lat: 50.0660, lng: 19.9178 },
   },
@@ -58,6 +63,7 @@ export const AGH_BUILDING_DETAILS = {
     faculty: 'Wydział Elektrotechniki, Automatyki, Informatyki i Inżynierii Biomedycznej (EAIiIB)',
     address: 'al. Adama Mickiewicza 30, Kraków',
     transitStop: 'AGH / UR',
+    stopWalkMinutes: 3,
     entryTip: 'Główny dziedziniec AGH przy A-0',
     coords: { lat: 50.0652, lng: 19.9221 },
   },
@@ -66,6 +72,7 @@ export const AGH_BUILDING_DETAILS = {
     faculty: 'Wydział EAIiIB',
     address: 'al. Adama Mickiewicza 30, Kraków',
     transitStop: 'AGH / UR',
+    stopWalkMinutes: 3,
     entryTip: 'Obok Pawilonu B-1',
     coords: { lat: 50.0656, lng: 19.9213 },
   },
@@ -73,7 +80,8 @@ export const AGH_BUILDING_DETAILS = {
     name: 'Pawilon B-3',
     faculty: 'Wydział EAIiIB',
     address: 'al. Adama Mickiewicza 30, Kraków',
-    transitStop: 'AGH / UR',
+    transitStop: 'Czarnowiejska',
+    stopWalkMinutes: 3,
     entryTip: 'Kompleks budynków B',
     coords: { lat: 50.0659, lng: 19.9205 },
   },
@@ -81,7 +89,8 @@ export const AGH_BUILDING_DETAILS = {
     name: 'Pawilon B-4',
     faculty: 'Wydział EAIiIB / WIMiR',
     address: 'al. Adama Mickiewicza 30, Kraków',
-    transitStop: 'AGH / UR lub Czarnowiejska',
+    transitStop: 'Czarnowiejska',
+    stopWalkMinutes: 3,
     entryTip: 'Wzdłuż głównej alei kampusu',
     coords: { lat: 50.0661, lng: 19.9198 },
   },
@@ -89,7 +98,8 @@ export const AGH_BUILDING_DETAILS = {
     name: 'Pawilon B-5',
     faculty: 'Wydział Inżynierii Mechanicznej i Robotyki (WIMiR)',
     address: 'al. Adama Mickiewicza 30, Kraków',
-    transitStop: 'AGH / UR lub Czarnowiejska',
+    transitStop: 'Czarnowiejska',
+    stopWalkMinutes: 2,
     entryTip: 'Wejście od alejki łączącej kampus z ul. Reymonta',
     coords: { lat: 50.0664, lng: 19.9192 },
   },
@@ -98,6 +108,7 @@ export const AGH_BUILDING_DETAILS = {
     faculty: 'Wydział WIMiR',
     address: 'al. Adama Mickiewicza 30, Kraków',
     transitStop: 'Czarnowiejska',
+    stopWalkMinutes: 2,
     entryTip: 'Kompleks B przy ul. Czarnowiejskiej',
     coords: { lat: 50.0666, lng: 19.9186 },
   },
@@ -106,6 +117,7 @@ export const AGH_BUILDING_DETAILS = {
     faculty: 'Wydział WIMiIP',
     address: 'al. Adama Mickiewicza 30, Kraków',
     transitStop: 'Czarnowiejska',
+    stopWalkMinutes: 2,
     entryTip: 'Pomiędzy B-6 a B-8',
     coords: { lat: 50.0668, lng: 19.9182 },
   },
@@ -113,7 +125,8 @@ export const AGH_BUILDING_DETAILS = {
     name: 'Pawilon B-8',
     faculty: 'Wydział Inżynierii Metali i Informatyki Przemysłowej (WIMiIP)',
     address: 'al. Adama Mickiewicza 30, Kraków',
-    transitStop: 'Czarnowiejska / Kawiory',
+    transitStop: 'Czarnowiejska',
+    stopWalkMinutes: 2,
     entryTip: 'Kompleks B przy ul. Czarnowiejskiej',
     coords: { lat: 50.0669, lng: 19.9180 },
   },
@@ -122,14 +135,20 @@ export const AGH_BUILDING_DETAILS = {
     faculty: 'Wydział Inżynierii Metali i Informatyki Przemysłowej (WIMiIP)',
     address: 'al. Adama Mickiewicza 30, Kraków',
     transitStop: 'Czarnowiejska',
-    entryTip: 'Blisko Biblioteki Głównej AGH i ul. Czarnowiejskiej',
+    alternativeStops: [
+      { name: 'Chopina', stopWalkMinutes: 4, tip: 'Al. Słowackiego / Chopina (od strony Parku Krakowskiego / ul. Szymanowskiego)' },
+      { name: 'AGH / UR', stopWalkMinutes: 5, tip: 'Al. Mickiewicza / Czarnowiejska' },
+    ],
+    stopWalkMinutes: 2,
+    entryTip: 'Z Czarnowiejskiej: ~2 min spaceru. Z przystanku Chopina: ~4 min (przez al. Słowackiego / Szymanowskiego)',
     coords: { lat: 50.0671, lng: 19.9172 },
   },
   'U-2': {
     name: 'Centrum Dydaktyki AGH (U-2)',
     faculty: 'Centrum Dydaktyczne',
     address: 'ul. Reymonta 7, Kraków',
-    transitStop: 'Miasteczko Studenckie AGH / Reymana',
+    transitStop: 'Miasteczko Studenckie AGH',
+    stopWalkMinutes: 3,
     entryTip: 'Nowoczesny przeszklony budynek dydaktyczny przy Miasteczku AGH',
     coords: { lat: 50.0669, lng: 19.9142 },
   },
@@ -138,6 +157,7 @@ export const AGH_BUILDING_DETAILS = {
     faculty: 'Centrum Energetyki',
     address: 'ul. Czarnowiejska 36, Kraków',
     transitStop: 'Czarnowiejska',
+    stopWalkMinutes: 1,
     entryTip: 'Kompleks Centrum Energetyki, wejście od ul. Czarnowiejskiej',
     coords: { lat: 50.0663, lng: 19.9210 },
   },
@@ -146,14 +166,29 @@ export const AGH_BUILDING_DETAILS = {
     faculty: 'Centrum Energetyki',
     address: 'ul. Czarnowiejska 36, Kraków',
     transitStop: 'Czarnowiejska',
+    stopWalkMinutes: 1,
     entryTip: 'Kompleks Centrum Energetyki',
     coords: { lat: 50.0665, lng: 19.9212 },
+  },
+  'C-7': {
+    name: 'Pawilon C-7 (Studium Języków Obcych AGH)',
+    faculty: 'Studium Języków Obcych (SJO)',
+    address: 'ul. Kawiory 26a / Gramatyka, Kraków',
+    transitStop: 'Kawiory',
+    alternativeStops: [
+      { name: 'Biprostal', stopWalkMinutes: 5, tip: 'Spacer ul. Gramatyka / Lea (~5 min od tramwaju z Głowackiego)' },
+      { name: 'Czarnowiejska', stopWalkMinutes: 4, tip: 'Dojście od ul. Czarnowiejskiej' },
+    ],
+    stopWalkMinutes: 2,
+    entryTip: 'Główny pawilon dydaktyczny lektoratów SJO (sala 212 na 2. piętrze). Wejście od strony ul. Kawiory / Gramatyka',
+    coords: { lat: 50.0680, lng: 19.9122 },
   },
   'A-0': {
     name: 'Gmach Główny AGH (A-0)',
     faculty: 'Rektorat i Aule Główne',
     address: 'al. Adama Mickiewicza 30, Kraków',
     transitStop: 'AGH / UR',
+    stopWalkMinutes: 1,
     entryTip: 'Główne monumentalne wejście z kolumnadą od al. Mickiewicza',
     coords: { lat: 50.0647, lng: 19.9234 },
   },
@@ -162,6 +197,7 @@ export const AGH_BUILDING_DETAILS = {
     faculty: 'Wydział Geodezji Górniczej i Inżynierii Środowiska',
     address: 'al. Adama Mickiewicza 30, Kraków',
     transitStop: 'AGH / UR',
+    stopWalkMinutes: 2,
     entryTip: 'Skrzydło po lewej stronie od wejścia A-0',
     coords: { lat: 50.0642, lng: 19.9229 },
   },
@@ -170,6 +206,7 @@ export const AGH_BUILDING_DETAILS = {
     faculty: 'Wydział Górnictwa i Geoinżynierii',
     address: 'al. Adama Mickiewicza 30, Kraków',
     transitStop: 'AGH / UR',
+    stopWalkMinutes: 2,
     entryTip: 'Skrzydło kompleksu A',
     coords: { lat: 50.0652, lng: 19.9240 },
   },
@@ -178,6 +215,7 @@ export const AGH_BUILDING_DETAILS = {
     faculty: 'Wydział Geologii, Geofizyki i Ochrony Środowiska',
     address: 'al. Adama Mickiewicza 30, Kraków',
     transitStop: 'AGH / UR',
+    stopWalkMinutes: 2,
     entryTip: 'Skrzydło kompleksu A od strony ul. Reymonta',
     coords: { lat: 50.0638, lng: 19.9224 },
   },
@@ -186,6 +224,7 @@ export const AGH_BUILDING_DETAILS = {
     faculty: 'Wydział Geodezji Górniczej',
     address: 'al. Adama Mickiewicza 30, Kraków',
     transitStop: 'AGH / UR',
+    stopWalkMinutes: 2,
     entryTip: 'Skrzydło A przy ul. Czarnowiejskiej',
     coords: { lat: 50.0648, lng: 19.9245 },
   },
@@ -193,7 +232,8 @@ export const AGH_BUILDING_DETAILS = {
     name: 'Pawilon D-1',
     faculty: 'Wydział Fizyki i Informatyki Stosowanej',
     address: 'ul. Reymonta 13, Kraków',
-    transitStop: 'Kawiory / Czarnowiejska',
+    transitStop: 'Kawiory',
+    stopWalkMinutes: 3,
     entryTip: 'Kompleks D przy ul. Reymonta',
     coords: { lat: 50.0678, lng: 19.9148 },
   },
@@ -202,6 +242,7 @@ export const AGH_BUILDING_DETAILS = {
     faculty: 'Wydział Fizyki i Informatyki Stosowanej',
     address: 'ul. Reymonta 15, Kraków',
     transitStop: 'Kawiory',
+    stopWalkMinutes: 3,
     entryTip: 'Obok Pawilonu D-1',
     coords: { lat: 50.0681, lng: 19.9142 },
   },
@@ -209,8 +250,12 @@ export const AGH_BUILDING_DETAILS = {
     name: 'Pawilon D-5',
     faculty: 'Wydział Zarządzania AGH',
     address: 'ul. Gramatyka 10, Kraków',
-    transitStop: 'Kawiory / Biprostal',
-    entryTip: 'W rejonie ul. Gramatyka',
+    transitStop: 'Kawiory',
+    alternativeStops: [
+      { name: 'Biprostal', stopWalkMinutes: 5, tip: 'Spacer ul. Gramatyka / Lea (~5 min od tramwaju z Głowackiego)' },
+    ],
+    stopWalkMinutes: 4,
+    entryTip: 'W rejonie ul. Gramatyka, sala 1 na parterze. Z Biprostalu: ~5 min pieszo',
     coords: { lat: 50.0684, lng: 19.9125 },
   },
   'D-10': {
@@ -218,14 +263,28 @@ export const AGH_BUILDING_DETAILS = {
     faculty: 'Kampus Kawiory',
     address: 'ul. Kawiory 26a, Kraków',
     transitStop: 'Kawiory',
+    stopWalkMinutes: 2,
     entryTip: 'W rejonie ul. Kawiory i Gramatyka',
     coords: { lat: 50.0678, lng: 19.9118 },
+  },
+  'D-11': {
+    name: 'Studium Języków Obcych AGH (D-11)',
+    faculty: 'Studium Języków Obcych (SJO)',
+    address: 'ul. Gramatyka 8a, Kraków',
+    transitStop: 'Kawiory',
+    alternativeStops: [
+      { name: 'Biprostal', stopWalkMinutes: 5, tip: 'Spacer ul. Gramatyka (~5 min od tramwaju z Głowackiego)' },
+    ],
+    stopWalkMinutes: 3,
+    entryTip: 'Główny budynek SJO przy ul. Gramatyka (sala 212 na 2. piętrze). Z Biprostalu: ~5 min pieszo prosto ul. Lea/Gramatyka',
+    coords: { lat: 50.0682, lng: 19.9120 },
   },
   'H-1': {
     name: 'Pawilon H-1 (Hala Sportowa)',
     faculty: 'Studium Wychowania Fizycznego i Sportu AGH',
     address: 'ul. Piastowska 26a, Kraków',
-    transitStop: 'Cichy Kącik / Miasteczko AGH',
+    transitStop: 'Miasteczko Studenckie AGH',
+    stopWalkMinutes: 3,
     entryTip: 'Hala i basen AGH przy Miasteczku Studenckim',
     coords: { lat: 50.0638, lng: 19.9215 },
   },
@@ -256,6 +315,93 @@ export function isSessionOnline(session, aghLoc) {
   return false;
 }
 
+/**
+ * Parses AGH room number to determine floor level and inside-building walking/stairs buffer.
+ * Examples:
+ * - "212" -> 2. piętro, sala 12 (+3 min) (np. angielski w sali 212)
+ * - "1"   -> Parter (+1 min) (np. D-5 sala 1)
+ * - "012" -> Parter, sala 12 (+1 min) (np. B-9 sala 012)
+ * - "1.12" -> 1. piętro, sala 12 (+2 min) (np. D-17 sala 1.12)
+ * - "429" -> 4. piętro, sala 29 (+5 min)
+ */
+export function parseAghFloor(room) {
+  if (!room) {
+    return {
+      floor: null,
+      floorLabel: null,
+      roomNumber: null,
+      insideMinutes: 2,
+    };
+  }
+
+  const cleanRoom = String(room).trim();
+
+  // 1. Format z kropką: np. "1.12", "1.19", "2.14", "0.1" (standard w D-17, C-2 itp.)
+  const dotMatch = cleanRoom.match(/^(\d+)\.([0-9a-zA-Z_-]+)$/);
+  if (dotMatch) {
+    const f = parseInt(dotMatch[1], 10);
+    const r = dotMatch[2];
+    return {
+      floor: f,
+      floorLabel: f === 0 ? 'parter' : `${f}. piętro`,
+      roomNumber: r,
+      insideMinutes: f === 0 ? 1 : Math.min(5, 1 + f),
+    };
+  }
+
+  // 2. Format z zerem wiodącym: np. "012", "01", "024" (np. B-9 s. 012) -> parter
+  if (/^0\d+/.test(cleanRoom)) {
+    const r = cleanRoom.replace(/^0+/, '') || cleanRoom;
+    return {
+      floor: 0,
+      floorLabel: 'parter',
+      roomNumber: r,
+      insideMinutes: 1,
+    };
+  }
+
+  // 3. Sala jednocyfrowa: np. "1", "2", "5" (np. D-5 s. 1) -> parter
+  if (/^\d$/.test(cleanRoom)) {
+    return {
+      floor: 0,
+      floorLabel: 'parter',
+      roomNumber: cleanRoom,
+      insideMinutes: 1,
+    };
+  }
+
+  // 4. Format 3-cyfrowy lub 4-cyfrowy: np. "212", "101", "305", "429"
+  // Pierwsza cyfra to numer piętra (np. 212 -> 2. piętro, sala 12; 429 -> 4. piętro, sala 29)
+  const threeDigitMatch = cleanRoom.match(/^([1-9])(\d{2}[a-zA-Z]?)$/);
+  if (threeDigitMatch) {
+    const f = parseInt(threeDigitMatch[1], 10);
+    const r = threeDigitMatch[2];
+    return {
+      floor: f,
+      floorLabel: `${f}. piętro`,
+      roomNumber: r,
+      insideMinutes: Math.min(5, 1 + f),
+    };
+  }
+
+  // 5. Przyziemie / Piwnica: np. "-1", "P-1", "S01"
+  if (/^[-–]1\b|^(p|s|piwnica|przyziemie)/i.test(cleanRoom)) {
+    return {
+      floor: -1,
+      floorLabel: 'przyziemie / piwnica',
+      roomNumber: cleanRoom,
+      insideMinutes: 2,
+    };
+  }
+
+  return {
+    floor: null,
+    floorLabel: null,
+    roomNumber: cleanRoom,
+    insideMinutes: 2,
+  };
+}
+
 export function parseAghLocation(location = '', description = '', title = '') {
   const locStr = String(location || '').trim();
   const descStr = String(description || '').trim();
@@ -277,17 +423,23 @@ export function parseAghLocation(location = '', description = '', title = '') {
       isRemote: true,
       building: 'A-0',
       room: null,
+      floor: null,
+      floorLabel: null,
       displayText: 'Zdalnie (Budynek A-0)',
       fullCampusText: 'Zdalnie (Budynek A-0 / USOS)',
       mapUrl: null,
       navigateUrl: null,
       isOnsite: false,
       buildingDetails: null,
+      transitStop: null,
+      walkFromStopMinutes: 0,
+      insideMinutes: 0,
+      totalWalkAndStairsMinutes: 0,
     };
   }
 
   // 2. Extract AGH Building
-  // Recognized pavilions: A-0..A-4, B-1..B-9, C-1..C-7, D-1..D-17, U-1..U-2
+  // Recognized pavilions: A-0..A-4, B-1..B-9, C-1..C-7, D-1..D-17, U-1..U-2, H-1
   let building = null;
 
   // Filter out CEFR language levels (B1, B2, C1, C2, A1, A2) in language courses so they aren't misparsed as AGH pavilions
@@ -299,8 +451,9 @@ export function parseAghLocation(location = '', description = '', title = '') {
       .replace(/\s+/g, ' ');
   }
 
+  // Matches "budynek D5", "bud. B-9", or standalone "D-5", "D5", "B9", "B-9", "D17", "C2"
   const buildingMatch = buildingSearchText.match(
-    /(?:(?:bud(?:ynek|\.)?|pawilon)\s*[:=-]?\s*([ABCDUH])[-–\s]?(\d{1,2})|\b([ABCDUH])[-–](\d{1,2})\b)/i
+    /(?:(?:bud(?:ynek|\.)?|pawilon)\s*[:=-]?\s*([ABCDUH])[-–\s]?(\d{1,2})|\b([ABCDUH])[-–]?(\d{1,2})\b)/i
   );
   if (buildingMatch) {
     const letter = (buildingMatch[1] || buildingMatch[3]).toUpperCase();
@@ -322,10 +475,7 @@ export function parseAghLocation(location = '', description = '', title = '') {
     }
   }
 
-  const buildingDetails = building ? AGH_BUILDING_DETAILS[building] : null;
-  const buildingExtraName = buildingDetails?.name || null;
-
-  // 3. Extract Room / Sala (supports Sala: 012, s.: 012, pokój: 112, s. 1.19, etc.)
+  // 3. Extract Room / Sala (supports Sala: 012, s.: 012, pokój: 112, s. 1.19, sala 1, etc.)
   let room = null;
   const roomMatch = cleanCombined.match(
     /\b(?:sala|pok[oó]j|lab(?:\.|oratorium)?|s(?:\.|\b))\s*[:=-]?\s*([0-9a-zA-Z._/-]+)/i
@@ -333,7 +483,7 @@ export function parseAghLocation(location = '', description = '', title = '') {
   if (roomMatch) {
     room = roomMatch[1].replace(/[,;)]+$/, '');
   } else if (building) {
-    // Try matching pattern "B-9, 012" or "B-9 012" or "B-9/012"
+    // Try matching pattern "B-9, 012" or "B-9 012" or "B-9/012" or "B9 012"
     const escapedB = building.replace('-', '[-–\\s]?');
     const simpleRoomMatch = cleanCombined.match(
       new RegExp(`\\b${escapedB}[,/\\s]+(?:s\\.|sala\\s*[:=-]?)?([0-9]{1,3}(?:\\.[0-9a-zA-Z]+)?)\\b`, 'i')
@@ -341,7 +491,23 @@ export function parseAghLocation(location = '', description = '', title = '') {
     if (simpleRoomMatch) {
       room = simpleRoomMatch[1];
     }
+  } else {
+    // Match lone room notation like "1.12" or "012"
+    const loneMatch = cleanCombined.match(/\b(\d+\.\d{1,3}|0\d{2})\b/);
+    if (loneMatch) {
+      room = loneMatch[1];
+    }
   }
+
+  // If language course (np. angielski, lektorat, SJO) and no building was specified:
+  // At AGH language classes are at SJO (Pawilon C-7, ul. Kawiory 26a / Gramatyka)
+  if (!building && (isLanguageSubject || /\bsjo\b/i.test(cleanCombined))) {
+    building = 'C-7';
+  }
+
+  const buildingDetails = building ? AGH_BUILDING_DETAILS[building] : null;
+  const buildingExtraName = buildingDetails?.name || null;
+  const floorInfo = parseAghFloor(room);
 
   // 4. Construct clean display texts
   let displayText = locStr;
@@ -370,6 +536,10 @@ export function parseAghLocation(location = '', description = '', title = '') {
     : displayText || (isOnsite ? 'Kampus AGH' : null);
 
   const coords = buildingDetails?.coords || (isOnsite ? { lat: 50.0647, lng: 19.9234 } : null);
+  const transitStop = buildingDetails?.transitStop || (isOnsite ? 'AGH / UR' : null);
+  const walkFromStopMinutes = buildingDetails?.stopWalkMinutes || 2;
+  const insideMinutes = floorInfo.insideMinutes || 1;
+  const totalWalkAndStairsMinutes = walkFromStopMinutes + insideMinutes;
 
   return {
     isRemote: false,
@@ -378,6 +548,15 @@ export function parseAghLocation(location = '', description = '', title = '') {
     buildingDetails,
     coords,
     room,
+    floor: floorInfo.floor,
+    floorLabel: floorInfo.floorLabel,
+    roomNumber: floorInfo.roomNumber,
+    insideMinutes,
+    walkFromStopMinutes,
+    transitStop,
+    stopWalkMinutes: walkFromStopMinutes,
+    alternativeStops: buildingDetails?.alternativeStops || [],
+    totalWalkAndStairsMinutes,
     displayText: displayText || locStr || null,
     fullCampusText,
     mapUrl,

@@ -41,6 +41,7 @@ export default function TransitAssistant({ session, compact = false, showHeader 
   const [showConfig, setShowConfig] = useState(false);
   const [bufferMinutes, setBufferMinutes] = useState(() => prefs.bufferMinutes ?? 5);
   const [customAddress, setCustomAddress] = useState(() => prefs.customAddress || MOGILSKA_HOME.address);
+  const [chosenStopName, setChosenStopName] = useState(null);
   const [now, setNow] = useState(new Date());
 
   // Keep clock updated every 15s for live countdowns
@@ -70,14 +71,22 @@ export default function TransitAssistant({ session, compact = false, showHeader 
 
   // 3. Resolve active origin coordinates
   const activeOrigin = useMemo(() => {
-    if (selectedOrigin === 'girlfriend' || selectedOrigin === 'gps') {
+    if (selectedOrigin === 'girlfriend') {
       return {
-        id: selectedOrigin,
-        name: selectedOrigin === 'girlfriend' ? 'U dziewczyny' : 'Moja lokalizacja GPS',
+        id: 'girlfriend',
+        name: PRESET_ORIGINS.girlfriend.name,
+        coords: PRESET_ORIGINS.girlfriend.coords || gpsCoords,
+        label: PRESET_ORIGINS.girlfriend.shortName,
+      };
+    }
+    if (selectedOrigin === 'gps') {
+      return {
+        id: 'gps',
+        name: 'Moja lokalizacja GPS',
         coords: gpsCoords,
         label: gpsCoords
           ? `GPS (${gpsCoords.lat.toFixed(4)}, ${gpsCoords.lng.toFixed(4)})`
-          : (selectedOrigin === 'girlfriend' ? 'U dziewczyny (Pobieram GPS...)' : 'GPS (Pobieram...)'),
+          : 'GPS (Pobieram...)',
       };
     }
     if (selectedOrigin === 'miasteczko') {
@@ -118,18 +127,18 @@ export default function TransitAssistant({ session, compact = false, showHeader 
   }, [activeOrigin.coords, destination?.coords]);
 
   const travelEstimates = useMemo(() => {
-    // 1. Girlfriend origin: user specified ~30 minutes commute, especially in the morning
+    // 1. Girlfriend origin: ul. Głowackiego (tramwaj do Biprostalu + przesiadka w autobus na Chopina/Czarnowiejską)
     if (selectedOrigin === 'girlfriend') {
-      const morningBaseline = 30;
+      const commuteBaseline = 20;
       if (distanceKm != null) {
         const calculated = estimateTravelMinutes(distanceKm);
         return {
           ...calculated,
-          transit: Math.max(morningBaseline, calculated.transit),
+          transit: Math.max(commuteBaseline, calculated.transit),
           recommended: 'transit',
         };
       }
-      return { walk: 50, bike: 25, transit: morningBaseline, car: 22, recommended: 'transit' };
+      return { walk: 35, bike: 12, transit: commuteBaseline, car: 12, recommended: 'transit' };
     }
 
     // 2. Mogilska 23 (Dom) or fallback
@@ -142,12 +151,24 @@ export default function TransitAssistant({ session, compact = false, showHeader 
   // Active travel mode (transit by default, walk if under 0.9km and not at girlfriend's)
   const chosenTravelMinutes = travelEstimates
     ? (selectedOrigin === 'girlfriend'
-        ? travelEstimates.transit // always ~30 min transit from girlfriend's place
+        ? travelEstimates.transit // ~20 min z Głowackiego
         : (distanceKm != null && distanceKm < 0.9 ? travelEstimates.walk : travelEstimates.transit))
-    : (selectedOrigin === 'girlfriend' ? 30 : 20);
+    : (selectedOrigin === 'girlfriend' ? 20 : 20);
 
   // Extra floor descent buffer (+2 min for 5th floor at Mogilska 23)
   const floorExtraMinutes = selectedOrigin === 'home' ? (MOGILSKA_HOME.floorBufferMinutes || 2) : 0;
+
+  // Active chosen stop (e.g. Czarnowiejska vs Chopina for B-9)
+  const effectiveStopName = chosenStopName || destination?.transitStop || 'Czarnowiejska';
+  const effectiveAltStop = aghLoc?.alternativeStops?.find((s) => s.name === effectiveStopName);
+  const effectiveWalkFromStop = effectiveAltStop
+    ? effectiveAltStop.stopWalkMinutes
+    : (aghLoc?.walkFromStopMinutes || 2);
+
+  // Extra time needed from bus/tram stop to classroom desk:
+  const destinationWalkAndStairsMinutes = effectiveWalkFromStop + (aghLoc?.insideMinutes || 1);
+  const isTransitTravel = !distanceKm || distanceKm >= 0.9;
+  const totalExtraLeadMinutes = floorExtraMinutes + (isTransitTravel ? destinationWalkAndStairsMinutes : 0);
 
   // 5. Departure Plan ("Kiedy wyjść, by zdążyć")
   const departurePlan = useMemo(() => {
@@ -156,10 +177,10 @@ export default function TransitAssistant({ session, compact = false, showHeader 
       sessionStart: session.start,
       travelMinutes: chosenTravelMinutes,
       bufferMinutes,
-      extraMinutes: floorExtraMinutes,
+      extraMinutes: totalExtraLeadMinutes,
       now,
     });
-  }, [session?.start, chosenTravelMinutes, bufferMinutes, floorExtraMinutes, now]);
+  }, [session?.start, chosenTravelMinutes, bufferMinutes, totalExtraLeadMinutes, now]);
 
   // 6. Request live GPS on click or origin switch
   const handleFetchGps = async () => {
@@ -179,7 +200,7 @@ export default function TransitAssistant({ session, compact = false, showHeader 
   const handleSelectOrigin = (type) => {
     setSelectedOrigin(type);
     saveStoredTransitPreferences({ originType: type });
-    if (type === 'girlfriend' || type === 'gps') {
+    if (type === 'gps') {
       handleFetchGps();
     }
   };
@@ -202,8 +223,12 @@ export default function TransitAssistant({ session, compact = false, showHeader 
   // 7. Dynamic URLs for Jakdojade & Google Maps
   const jakdojadeUrl = buildJakdojadeUrl({
     session,
+    aghLoc,
     destinationCoords: destination.coords,
-    destinationName: destination.name,
+    destinationName: effectiveStopName || destination.name,
+    transitStop: effectiveStopName,
+    walkFromStopMinutes: effectiveWalkFromStop,
+    insideMinutes: aghLoc?.insideMinutes,
     originCoords: activeOrigin.coords,
     originName: activeOrigin.name,
   });
@@ -283,11 +308,18 @@ export default function TransitAssistant({ session, compact = false, showHeader 
                 <span>Start: <strong className="text-white font-semibold">ul. Mogilska 23</strong> <span className="text-gray-400 text-[11px]">(5. piętro, +2 min winda)</span></span>
               </span>
             </div>
-          ) : selectedOrigin === 'girlfriend' || selectedOrigin === 'gps' ? (
+          ) : selectedOrigin === 'girlfriend' ? (
             <div className="flex items-center gap-1.5 min-w-0">
               <span className="text-pink-300 font-medium truncate flex items-center gap-1">
                 <span>❤️</span>
-                <span>Start: <strong className="text-white font-semibold">U dziewczyny (GPS)</strong> <span className="text-pink-300/80 text-[11px]">(śr. 30 min dojazdu rano)</span></span>
+                <span>Start: <strong className="text-white font-semibold">U dziewczyny (Głowackiego)</strong> <span className="text-pink-300/80 text-[11px]">(tramwaj ➔ Biprostal ➔ Chopina/Czarnowiejska)</span></span>
+              </span>
+            </div>
+          ) : selectedOrigin === 'gps' ? (
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span className="text-pink-300 font-medium truncate flex items-center gap-1">
+                <span>📍</span>
+                <span>Start: <strong className="text-white font-semibold">Lokalizacja GPS</strong></span>
               </span>
               {gpsLoading && <Crosshair size={11} className="animate-spin text-pink-400 flex-shrink-0" />}
             </div>
@@ -307,10 +339,10 @@ export default function TransitAssistant({ session, compact = false, showHeader 
                 type="button"
                 onClick={() => handleSelectOrigin('girlfriend')}
                 className="text-[11px] text-gray-400 hover:text-pink-300 transition-colors flex items-center gap-1 px-2 py-0.5 rounded-lg hover:bg-gray-800/70 border border-transparent hover:border-gray-700/60"
-                title="Śpisz u dziewczyny? Przełącz na GPS (średnio 30 min na zajęcia rano)"
+                title="Wychodzisz od dziewczyny z ul. Głowackiego? Przełącz na Głowackiego"
               >
                 <span>❤️</span>
-                <span className="hidden sm:inline">U dziewczyny (GPS: ~30m)</span>
+                <span className="hidden sm:inline">U dziewczyny (Głowackiego)</span>
               </button>
             ) : (
               <button
@@ -358,30 +390,19 @@ export default function TransitAssistant({ session, compact = false, showHeader 
                   type="button"
                   onClick={() => handleSelectOrigin('girlfriend')}
                   className={`flex items-center gap-2 p-2.5 rounded-xl border text-left transition-all ${
-                    selectedOrigin === 'girlfriend' || selectedOrigin === 'gps'
+                    selectedOrigin === 'girlfriend'
                       ? 'bg-pink-600/25 border-pink-500 text-white shadow-sm ring-1 ring-pink-500/50'
                       : 'bg-gray-850 hover:bg-gray-800 border-gray-750 text-gray-300'
                   }`}
                 >
                   <span className="text-base">❤️</span>
                   <div className="min-w-0 flex-1">
-                    <p className="font-bold truncate">U dziewczyny (GPS)</p>
+                    <p className="font-bold truncate">U dziewczyny (Głowackiego)</p>
                     <p className="text-[10px] text-pink-300/80 truncate">
-                      Średnio 30 min dojazdu rano
+                      Głowackiego ➔ Biprostal (~20 min)
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleFetchGps();
-                    }}
-                    disabled={gpsLoading}
-                    className="p-1 rounded-lg bg-gray-750 hover:bg-gray-700 text-gray-300 hover:text-white"
-                    title="Odśwież współrzędne GPS"
-                  >
-                    <Crosshair size={12} className={gpsLoading ? 'animate-spin text-pink-400' : ''} />
-                  </button>
+                  {selectedOrigin === 'girlfriend' && <Check size={13} className="text-pink-400 flex-shrink-0" />}
                 </button>
 
                 {/* 3. Miasteczko Studenckie AGH */}
@@ -548,19 +569,83 @@ export default function TransitAssistant({ session, compact = false, showHeader 
           <div className="flex items-start gap-2.5">
             <MapPin size={15} className="text-emerald-400 flex-shrink-0 mt-0.5" />
             <div className="min-w-0 flex-1">
-              <p className="font-bold text-white truncate">
-                {destination.name} {aghLoc?.room ? `• Sala ${aghLoc.room}` : ''}
-              </p>
-              <p className="text-gray-400 text-[11px] truncate">{destination.address}</p>
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="font-bold text-white">
+                  {destination.name} {aghLoc?.room ? `• Sala ${aghLoc.room}` : ''}
+                </p>
+                {aghLoc?.floorLabel && (
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-700/60">
+                    {aghLoc.floorLabel}
+                  </span>
+                )}
+              </div>
+              <p className="text-gray-400 text-[11px] truncate mt-0.5">{destination.address}</p>
             </div>
           </div>
 
           {destination.transitStop && (
-            <div className="flex items-center gap-2 text-gray-300 pl-6 text-[11px]">
-              <Bus size={12} className="text-sky-400 flex-shrink-0" />
-              <span>
-                Najbliższy przystanek: <strong className="text-white font-semibold">{destination.transitStop}</strong>
-              </span>
+            <div className="space-y-1.5 pl-6 pt-0.5">
+              <div className="flex items-center gap-2 text-gray-300 text-[11px] flex-wrap">
+                <Bus size={12} className="text-sky-400 flex-shrink-0" />
+                <span>
+                  Przystanek docelowy MPK: <strong className="text-white font-semibold">{effectiveStopName}</strong>
+                </span>
+                <span className="text-gray-500">•</span>
+                <span className="text-sky-300">
+                  spacer pod budynek: <strong>~{effectiveWalkFromStop} min</strong>
+                </span>
+                {aghLoc?.insideMinutes ? (
+                  <>
+                    <span className="text-gray-500">•</span>
+                    <span className="text-emerald-300">
+                      schody / wejście na {aghLoc.floorLabel || 'salę'}: <strong>~{aghLoc.insideMinutes} min</strong>
+                    </span>
+                  </>
+                ) : null}
+              </div>
+
+              {/* Stop switcher pills (e.g. Czarnowiejska vs Chopina for B-9) */}
+              {aghLoc?.alternativeStops && aghLoc.alternativeStops.length > 0 && (
+                <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                  <span className="text-[10px] text-gray-400 font-medium">Wybierz przystanek:</span>
+                  <button
+                    type="button"
+                    onClick={() => setChosenStopName(destination.transitStop)}
+                    className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all border ${
+                      effectiveStopName === destination.transitStop
+                        ? 'bg-sky-600 text-white border-sky-400 shadow-sm'
+                        : 'bg-gray-800 text-gray-300 border-gray-700 hover:text-white'
+                    }`}
+                  >
+                    🚏 {destination.transitStop} (~{aghLoc?.walkFromStopMinutes || 2}m)
+                  </button>
+                  {aghLoc.alternativeStops.map((alt) => (
+                    <button
+                      key={alt.name}
+                      type="button"
+                      onClick={() => setChosenStopName(alt.name)}
+                      className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all border ${
+                        effectiveStopName === alt.name
+                          ? 'bg-sky-600 text-white border-sky-400 shadow-sm'
+                          : 'bg-gray-800 text-gray-300 border-gray-700 hover:text-white'
+                      }`}
+                      title={alt.tip || alt.name}
+                    >
+                      🚏 {alt.name} (~{alt.stopWalkMinutes}m)
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Route Hint when coming from girlfriend's place */}
+          {selectedOrigin === 'girlfriend' && (
+            <div className="mt-2.5 p-2.5 rounded-lg bg-pink-950/40 border border-pink-700/50 flex items-start gap-2 text-[11px] text-pink-200">
+              <span className="text-base leading-none">💡</span>
+              <div>
+                <span className="font-semibold text-white">Dojazd od dziewczyny:</span> wsiądź w tramwaj na przystanku <strong>Głowackiego</strong> ➔ na <strong>Biprostalu</strong> przesiądź się w autobus do przystanku <strong>{effectiveStopName}</strong>{effectiveStopName === 'Czarnowiejska' && aghLoc?.building === 'B-9' ? ' (lub Chopina)' : ''}{aghLoc?.building === 'C-7' ? ' (lub podejdź ~5 min pieszo z Biprostalu)' : ''}.
+              </div>
             </div>
           )}
 

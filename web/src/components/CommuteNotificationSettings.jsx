@@ -427,9 +427,9 @@ export default function CommuteNotificationSettings() {
           >
             <span className="text-lg">❤️</span>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold truncate">U dziewczyny (GPS)</p>
+              <p className="text-xs font-bold truncate">U dziewczyny (Głowackiego)</p>
               <p className="text-[10px] text-pink-300/80 truncate">
-                Średnio 30 min dojazdu rano
+                Głowackiego ➔ Biprostal (~20 min)
               </p>
             </div>
             {(originType === 'girlfriend' || originType === 'gps') && <Check size={13} className="text-pink-400 flex-shrink-0" />}
@@ -460,7 +460,8 @@ export default function CommuteNotificationSettings() {
             href={buildJakdojadeUrl({
               session: { start: new Date() },
               destinationCoords: AGH_CAMPUS_CENTER,
-              destinationName: 'Główny Kampus AGH (al. Mickiewicza 30)',
+              destinationName: 'AGH / UR',
+              transitStop: 'AGH / UR',
               originCoords: (originType === 'girlfriend' || originType === 'gps')
                 ? gpsLocation
                 : (originType === 'home' ? MOGILSKA_HOME.coords : PRESET_ORIGINS.miasteczko.coords),

@@ -320,9 +320,14 @@ export default function ClassCard({ session, course, onClick, onEdit, compact = 
                 <span className="flex items-center gap-1.5 text-emerald-400 font-medium truncate min-w-0">
                   <MapPin size={12} className="flex-shrink-0" />
                   <span className="truncate">{aghLoc.displayText || session.location}</span>
-                  {aghLoc.building && (
-                    <span className="text-[10px] font-bold text-emerald-300 bg-emerald-950/70 border border-emerald-700/80 px-1 rounded flex-shrink-0">
-                      Bud. {aghLoc.building}
+                  {aghLoc.floorLabel && (
+                    <span className="text-[10px] font-semibold text-emerald-300 bg-emerald-950/70 border border-emerald-700/80 px-1 rounded flex-shrink-0" title={`Piętro: ${aghLoc.floorLabel}`}>
+                      {aghLoc.floorLabel}
+                    </span>
+                  )}
+                  {aghLoc.transitStop && (
+                    <span className="hidden md:inline-flex text-[10px] text-sky-300 bg-sky-950/60 border border-sky-800/60 px-1 rounded flex-shrink-0" title={`Najbliższy przystanek MPK: ${aghLoc.transitStop} (~${aghLoc.walkFromStopMinutes || 2} min pieszo)`}>
+                      🚏 {aghLoc.transitStop}
                     </span>
                   )}
                 </span>
@@ -377,14 +382,18 @@ export default function ClassCard({ session, course, onClick, onEdit, compact = 
               <a
                 href={buildJakdojadeUrl({
                   session,
+                  aghLoc,
                   destinationCoords: aghLoc.coords,
-                  destinationName: aghLoc.building ? `AGH Budynek ${aghLoc.building}` : session.location,
+                  destinationName: aghLoc.transitStop || (aghLoc.building ? `AGH Budynek ${aghLoc.building}` : session.location),
+                  transitStop: aghLoc.transitStop,
+                  walkFromStopMinutes: aghLoc.walkFromStopMinutes,
+                  insideMinutes: aghLoc.insideMinutes,
                 })}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
                 className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-teal-800/80 hover:bg-teal-700 text-teal-100 hover:text-white text-xs font-semibold transition-all shadow hover:scale-[1.02] border border-teal-600/40"
-                title="Otwórz Jakdojadę (zaplanowany przyjazd przed zajęciami)"
+                title={`Jakdojadę: przystanek ${aghLoc.transitStop || 'AGH'} (dojście z przystanku pod salę: ~${aghLoc.totalWalkAndStairsMinutes || 3} min)`}
               >
                 <Bus size={11} />
                 <span>Jakdojadę</span>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   CalendarDays, Calendar, Inbox, CheckSquare, Settings, Plus,
-  ChevronRight, BookOpen, GraduationCap, Check, Edit3, Layers, Sparkles, X
+  ChevronRight, BookOpen, GraduationCap, Check, Edit3, Layers, Sparkles, X, Download
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { pl } from 'date-fns/locale';
@@ -10,6 +10,7 @@ import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import CourseModal from './CourseModal';
 import { getCourseSubsections } from '../utils/courseMatcher';
+import { usePwaInstall } from '../hooks/usePwaInstall';
 
 const TYPE_ICONS = {
   lecture: '📘',
@@ -52,6 +53,7 @@ export default function Sidebar({ mobileOpen = false, onCloseMobile = () => {} }
   } = useData();
   const { user, logout } = useAuth();
   const [showAddCourse, setShowAddCourse] = useState(false);
+  const { isInstallable, isStandalone, isIos, installApp } = usePwaInstall();
 
   const handleInitSemester2 = async () => {
     setIsInitializing(true);
@@ -377,6 +379,22 @@ export default function Sidebar({ mobileOpen = false, onCloseMobile = () => {} }
 
       {/* Bottom: Theme toggle + Settings + logout */}
       <div className="px-2 py-3 border-t border-gray-800 space-y-1">
+        {!isStandalone && (isInstallable || isIos) && (
+          <button
+            type="button"
+            onClick={installApp}
+            className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-indigo-300 bg-indigo-950/60 border border-indigo-500/40 hover:bg-indigo-900/70 hover:text-white transition-all shadow-sm mb-1 group"
+            title="Zainstaluj aplikację na telefonie lub komputerze"
+          >
+            <div className="flex items-center gap-2 min-w-0">
+              <Download size={14} className="text-indigo-400 group-hover:scale-110 transition-transform flex-shrink-0" />
+              <span className="truncate">Zainstaluj aplikację</span>
+            </div>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-600 text-white font-bold flex-shrink-0">
+              PWA
+            </span>
+          </button>
+        )}
         <button
           type="button"
           onClick={toggleTheme}
